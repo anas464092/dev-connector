@@ -13,6 +13,7 @@ import Posts from './Pages/Posts';
 import SinglePost from './Pages/SinglePost';
 import Protected from './components/Protected';
 import AddPost from './Pages/AddPost';
+import ProfilePage from './Pages/ProfilePage';
 
 const Root = () => (
     <Router>
@@ -21,12 +22,13 @@ const Root = () => (
                 <Route element={<Protected />}>
                     <Route path='/posts' element={<Posts />} />
                     <Route path='/post/:id' element={<SinglePost />} />
-                    <Route path='add-post' element={<AddPost />} />
+                    <Route path='/add-post' element={<AddPost />} />
                 </Route>
                 <Route index path='/' element={<Home />} />
                 <Route path='/login' element={<Login />} />
                 <Route path='/register' element={<Register />} />
                 <Route path='/developers' element={<Developers />} />
+                <Route path='/profile' element={<ProfilePage />} />
             </Route>
         </Routes>
     </Router>

@@ -32,13 +32,8 @@ function Register() {
                 <Form.Group as={Col} md='4'>
                     <Form.Label>Username</Form.Label>
                     <InputGroup hasValidation>
-                        <InputGroup.Text>
-                            @
-                        </InputGroup.Text>
-                        <Form.Control
-                            type='text'
-                            placeholder='Username'
-                        />
+                        <InputGroup.Text>@</InputGroup.Text>
+                        <Form.Control type='text' placeholder='Username' />
                     </InputGroup>
                 </Form.Group>
             </Row>

@@ -1,8 +1,14 @@
 import React from 'react';
 import { Card, Col, Image, ListGroup, Row } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function Developers() {
+    const navigate = useNavigate();
+    const showProfile = () => {
+        navigate('/profile');
+    };
+
     return (
         <>
             <Link className='btn btn-light my-3' to='/'>
@@ -14,8 +20,9 @@ function Developers() {
                     background: '#747474',
                     padding: '20px 10px',
                     marginTop: '20px',
+                    cursor: 'pointer',
                 }}
-                onClick={() => console.log('Hello')}
+                onClick={showProfile}
             >
                 <Col md={3}>
                     <Image

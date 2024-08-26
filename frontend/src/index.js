@@ -12,6 +12,7 @@ import Developers from './Pages/Developers';
 import Posts from './Pages/Posts';
 import SinglePost from './Pages/SinglePost';
 import Protected from './components/Protected';
+import AddPost from './Pages/AddPost';
 
 const Root = () => (
     <Router>
@@ -20,6 +21,7 @@ const Root = () => (
                 <Route element={<Protected />}>
                     <Route path='/posts' element={<Posts />} />
                     <Route path='/post/:id' element={<SinglePost />} />
+                    <Route path='add-post' element={<AddPost />} />
                 </Route>
                 <Route index path='/' element={<Home />} />
                 <Route path='/login' element={<Login />} />

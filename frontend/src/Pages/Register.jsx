@@ -20,9 +20,6 @@ function Register() {
                         name='firstName'
                         placeholder='First Name'
                     />
-                    <Form.Control.Feedback tooltip>
-                        Looks good!
-                    </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group as={Col} md='4' className='position-relative'>
                     <Form.Label>Last name</Form.Label>
@@ -31,21 +28,16 @@ function Register() {
                         placeholder='Last Name'
                         name='lastName'
                     />
-                    <Form.Control.Feedback tooltip>
-                        Looks good!
-                    </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group as={Col} md='4'>
                     <Form.Label>Username</Form.Label>
                     <InputGroup hasValidation>
-                        <InputGroup.Text id='inputGroupPrepend'>
+                        <InputGroup.Text>
                             @
                         </InputGroup.Text>
                         <Form.Control
                             type='text'
                             placeholder='Username'
-                            aria-describedby='inputGroupPrepend'
-                            name='username'
                         />
                     </InputGroup>
                 </Form.Group>

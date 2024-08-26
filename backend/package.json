@@ -1,0 +1,43 @@
+{
+    "name": "dev-connector",
+    "version": "1.0.0",
+    "description": "Social interaction app for developers",
+    "main": "server.js",
+    "type": "module",
+    "scripts": {
+        "frontend-install": "npm install --prefix frontend",
+        "server": "nodemon index.js",
+        "start": "node index.js",
+        "frontend": "npm run start --prefix ../frontend",
+        "dev": "concurrently \"npm run server\" \"npm run frontend\""
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/anas464092/connect-developer.git"
+    },
+    "author": "Anas Rehman",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/anas464092/connect-developer/issues"
+    },
+    "homepage": "https://github.com/anas464092/connect-developer#readme",
+    "dependencies": {
+        "bcryptjs": "^2.4.3",
+        "cloudinary": "^2.4.0",
+        "concurrently": "^8.2.2",
+        "cookie-parser": "^1.4.6",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
+        "express": "^4.19.2",
+        "gravatar": "^1.8.2",
+        "jsonwebtoken": "^9.0.2",
+        "mongoose": "^8.5.3",
+        "multer": "^1.4.5-lts.1",
+        "passport": "^0.7.0",
+        "passport-jwt": "^4.0.1",
+        "validator": "^13.12.0"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.4"
+    }
+}

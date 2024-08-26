@@ -12,7 +12,6 @@ import Developers from './Pages/Developers';
 import Posts from './Pages/Posts';
 import SinglePost from './Pages/SinglePost';
 import Protected from './components/Protected';
-import AddComment from './components/AddComment';
 
 const Root = () => (
     <Router>
@@ -21,10 +20,6 @@ const Root = () => (
                 <Route element={<Protected />}>
                     <Route path='/posts' element={<Posts />} />
                     <Route path='/post/:id' element={<SinglePost />} />
-                    <Route
-                        path='/post/add-comment/:id'
-                        element={<AddComment />}
-                    />
                 </Route>
                 <Route index path='/' element={<Home />} />
                 <Route path='/login' element={<Login />} />

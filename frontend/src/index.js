@@ -14,6 +14,7 @@ import SinglePost from './Pages/SinglePost';
 import Protected from './components/Protected';
 import AddPost from './Pages/AddPost';
 import ProfilePage from './Pages/ProfilePage';
+import Dashboard from './Pages/Dashboard';
 
 const Root = () => (
     <Router>
@@ -23,6 +24,7 @@ const Root = () => (
                     <Route path='/posts' element={<Posts />} />
                     <Route path='/post/:id' element={<SinglePost />} />
                     <Route path='/add-post' element={<AddPost />} />
+                    <Route path='/dashboard' element={<Dashboard />} />
                 </Route>
                 <Route index path='/' element={<Home />} />
                 <Route path='/login' element={<Login />} />

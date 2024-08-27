@@ -25,6 +25,7 @@ function Register() {
                 password: values.password,
             };
             console.log(payload);
+            //  ============ API CALL ================
         },
     });
 
@@ -61,6 +62,15 @@ function Register() {
                         type='password'
                         required
                         placeholder='Password'
+                    />
+                </Form.Group>
+                <Form.Group className='mb-3'>
+                    <Form.Label style={{ color: 'aqua' }}>Avatar</Form.Label>
+                    <Form.Control
+                        type='file'
+                        required
+                        name='file'
+                        accept='image/*'
                     />
                 </Form.Group>
                 <Button

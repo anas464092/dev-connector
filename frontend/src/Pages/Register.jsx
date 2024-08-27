@@ -1,69 +1,77 @@
 import Button from 'react-bootstrap/Button';
-import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
-import InputGroup from 'react-bootstrap/InputGroup';
-import Row from 'react-bootstrap/Row';
+import { useFormik } from 'formik';
+import { validateRegister } from '../validation/registerValidator';
+import { Toaster } from 'react-hot-toast';
 
 function Register() {
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log('Hello');
-    };
+    // ==========================  FORMIK VALIDATION =================================
+    const formik = useFormik({
+        initialValues: {
+            name: '',
+            email: '',
+            password: '',
+        },
+        validate: validateRegister,
+        validateOnBlur: false,
+        validateOnChange: false,
+        onSubmit: async (values, resetForm) => {
+            values.name = values.name.trim();
+            values.email = values.email.trim();
+            values.password = values.password.trim();
+            const payload = {
+                name: values.name,
+                email: values.email,
+                password: values.password,
+            };
+            console.log(payload);
+        },
+    });
+
+    // =========================== FORMIK PART END ==================================
 
     return (
-        <Form noValidate onSubmit={handleSubmit}>
-            <Row className='mb-3'>
-                <Form.Group as={Col} md='4' className='position-relative'>
-                    <Form.Label>First name</Form.Label>
+        <>
+            <Toaster position='top-center' reverseOrder={false}></Toaster>
+            <Form onSubmit={formik.handleSubmit} className='my-4'>
+                <Form.Group className='mb-3'>
+                    <Form.Label style={{ color: 'aqua' }}>Full Name</Form.Label>
                     <Form.Control
+                        {...formik.getFieldProps('name')}
                         type='text'
-                        name='firstName'
-                        placeholder='First Name'
+                        required
+                        placeholder='Enter email'
                     />
                 </Form.Group>
-                <Form.Group as={Col} md='4' className='position-relative'>
-                    <Form.Label>Last name</Form.Label>
+                <Form.Group className='mb-3'>
+                    <Form.Label style={{ color: 'aqua' }}>
+                        Email address
+                    </Form.Label>
                     <Form.Control
-                        type='text'
-                        placeholder='Last Name'
-                        name='lastName'
+                        {...formik.getFieldProps('email')}
+                        type='email'
+                        required
+                        placeholder='Enter email'
                     />
                 </Form.Group>
-                <Form.Group as={Col} md='4'>
-                    <Form.Label>Username</Form.Label>
-                    <InputGroup hasValidation>
-                        <InputGroup.Text>@</InputGroup.Text>
-                        <Form.Control type='text' placeholder='Username' />
-                    </InputGroup>
-                </Form.Group>
-            </Row>
-            <Row className='mb-3'>
-                <Form.Group as={Col} md='6' className='position-relative'>
-                    <Form.Label>City</Form.Label>
-                    <Form.Control type='text' placeholder='City' name='city' />
-                </Form.Group>
-                <Form.Group as={Col} md='3' className='position-relative'>
-                    <Form.Label>State</Form.Label>
+                <Form.Group className='mb-3' controlId='formBasicPassword'>
+                    <Form.Label style={{ color: 'aqua' }}>Password</Form.Label>
                     <Form.Control
-                        type='text'
-                        placeholder='State'
-                        name='state'
+                        {...formik.getFieldProps('password')}
+                        type='password'
+                        required
+                        placeholder='Password'
                     />
                 </Form.Group>
-            </Row>
-            <Form.Group className='position-relative mb-3'>
-                <Form.Label>File</Form.Label>
-                <Form.Control
-                    type='file'
-                    required
-                    name='file'
-                    accept='image/*'
-                />
-            </Form.Group>
-            <Button style={{ marginTop: '10px' }} type='submit'>
-                Register
-            </Button>
-        </Form>
+                <Button
+                    style={{ marginTop: '10px', padding: '6px 20px' }}
+                    variant='primary'
+                    type='submit'
+                >
+                    Register
+                </Button>
+            </Form>
+        </>
     );
 }
 

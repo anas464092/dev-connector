@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     MDBCol,
     MDBContainer,
@@ -107,12 +107,24 @@ export default function Dashboard() {
                                         style={{ width: '150px' }}
                                         fluid
                                     />
-                                    <p className='text-muted mb-1'>
-                                        Full Stack Developer
-                                    </p>
-                                    <p className='text-muted mb-4'>
-                                        Bay Area, San Francisco, CA
-                                    </p>
+                                    <Form.Control
+                                        style={{
+                                            textAlign: 'center',
+                                            marginTop: '3px',
+                                        }}
+                                        type='text'
+                                        value='status'
+                                        placeholder='Your website'
+                                    />
+                                    <Form.Control
+                                        style={{
+                                            textAlign: 'center',
+                                            marginTop: '3px',
+                                        }}
+                                        type='text'
+                                        value='company'
+                                        placeholder='Your website'
+                                    />
                                 </MDBCardBody>
                             </MDBCard>
 
@@ -221,7 +233,7 @@ export default function Dashboard() {
                                             <MDBCardText className='text-muted'>
                                                 <Form.Control
                                                     type='text'
-                                                    value='(097) 234-5678'
+                                                    value='000-000000-000'
                                                     placeholder='Your linkedIn'
                                                 />
                                             </MDBCardText>

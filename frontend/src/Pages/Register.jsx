@@ -1,13 +1,16 @@
-import React, { useRef } from 'react';
-import Button from 'react-bootstrap/Button';
+import React, { useRef, useState } from 'react';
+import { Button, Spinner } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import { useFormik } from 'formik';
 import { validateRegister } from '../validation/registerValidator';
 import axios from 'axios';
 import { Toaster, toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router';
 
 function Register() {
+    const navigate = useNavigate();
     const fileInputRef = useRef(null);
+    const [loading, setLoading] = useState(false);
 
     // ==========================  FORMIK VALIDATION =================================
     const formik = useFormik({
@@ -21,6 +24,7 @@ function Register() {
         validateOnBlur: false,
         validateOnChange: false,
         onSubmit: async (values, { resetForm }) => {
+            setLoading(true);
             const formData = new FormData();
             formData.append('name', values.name.trim());
             formData.append('email', values.email.trim());
@@ -39,6 +43,13 @@ function Register() {
                     resetForm();
                     if (fileInputRef.current) {
                         fileInputRef.current.value = null; // Reset the file input
+                        setTimeout(() => {
+                            navigate('/login');
+                        }, 1000);
+                        localStorage.setItem(
+                            'registerUserId',
+                            JSON.stringify(res.data.data._id)
+                        );
                     }
                 }
             } catch (err) {
@@ -55,6 +66,7 @@ function Register() {
                     toast.error('Network Error or Backend Not Reachable.');
                 }
             }
+            setLoading(false);
         },
     });
 
@@ -113,8 +125,13 @@ function Register() {
                     style={{ marginTop: '10px', padding: '6px 20px' }}
                     variant='primary'
                     type='submit'
+                    disabled={loading}
                 >
-                    Register
+                    {loading ? (
+                        <Spinner animation='border' role='status' />
+                    ) : (
+                        <span>Register</span>
+                    )}
                 </Button>
             </Form>
         </>

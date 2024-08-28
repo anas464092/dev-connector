@@ -3,6 +3,7 @@ import Form from 'react-bootstrap/Form';
 import { useFormik } from 'formik';
 import { validateRegister } from '../validation/registerValidator';
 import { Toaster } from 'react-hot-toast';
+import axios from 'axios';
 
 function Register() {
     // ==========================  FORMIK VALIDATION =================================
@@ -11,21 +12,26 @@ function Register() {
             name: '',
             email: '',
             password: '',
+            avatar: '',
         },
         validate: validateRegister,
         validateOnBlur: false,
         validateOnChange: false,
         onSubmit: async (values, resetForm) => {
-            values.name = values.name.trim();
-            values.email = values.email.trim();
-            values.password = values.password.trim();
-            const payload = {
-                name: values.name,
-                email: values.email,
-                password: values.password,
-            };
-            console.log(payload);
-            //  ============ API CALL ================
+            const formData = new FormData();
+            formData.append('name', values.name.trim());
+            formData.append('email', values.email.trim());
+            formData.append('password', values.password.trim());
+            formData.append('avatar', values.avatar);
+
+            await axios
+                .post('/api/users/register', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
+                .then((res) => console.log(res.data))
+                .catch((err) => console.log(err.response.data));
         },
     });
 
@@ -71,6 +77,12 @@ function Register() {
                         required
                         name='file'
                         accept='image/*'
+                        onChange={(event) => {
+                            formik.setFieldValue(
+                                'avatar',
+                                event.currentTarget.files[0]
+                            );
+                        }}
                     />
                 </Form.Group>
                 <Button

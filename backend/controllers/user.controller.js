@@ -13,6 +13,7 @@ export const registerUser = asyncHanlder(async (req, res) => {
     // Bycrypt password
     // Create User
     // Send response
+
     const { name, email, password } = req.body;
     if (!name) {
         throw new ApiError(400, 'Name required');
@@ -23,29 +24,37 @@ export const registerUser = asyncHanlder(async (req, res) => {
     if (!password) {
         throw new ApiError(400, 'Password Required');
     }
-    const existedUser = await User.findOne({ email });
-    if (existedUser) {
-        throw new ApiError(409, 'Email already registered.');
+    const avatar = req.file ? req.file.path : null;
+    if (!avatar) {
+        throw new ApiError(400, 'Avatar Required');
     }
-    const avatar = gravatar.url(email, {
-        s: '200',
-        r: 'pg',
-        d: 'identicon',
-    });
-    const user = {
-        name,
-        email,
-        password,
-        avatar,
-    };
-    await User.create(user);
-    const userCreated = await User.findOne({ email }).select('-password');
-    if (!userCreated) {
-        throw new ApiError(500, 'USER CANT REGISTERD TRY LATER.');
-    }
-    res.status(201).json(
-        new ApiResponse(201, 'User created successfuly', userCreated)
-    );
+    //* Data validation done by the user...
+
+    res.status(200).json({ body: req.body, avatar });
+    // ================ PREVIOUS =================
+    // const existedUser = await User.findOne({ email });
+    // if (existedUser) {
+    //     throw new ApiError(409, 'Email already registered.');
+    // }
+    // const avatar = gravatar.url(email, {
+    //     s: '200',
+    //     r: 'pg',
+    //     d: 'identicon',
+    // });
+    // const user = {
+    //     name,
+    //     email,
+    //     password,
+    //     avatar,
+    // };
+    // await User.create(user);
+    // const userCreated = await User.findOne({ email }).select('-password');
+    // if (!userCreated) {
+    //     throw new ApiError(500, 'USER CANT REGISTERD TRY LATER.');
+    // }
+    // res.status(201).json(
+    //     new ApiResponse(201, 'User created successfuly', userCreated)
+    // );
 });
 
 export const loginUser = asyncHanlder(async (req, res) => {

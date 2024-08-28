@@ -6,14 +6,26 @@ import postsRoute from './routes/api/posts.routes.js';
 import profileRoute from './routes/api/profile.routes.js';
 
 const app = express();
-app.use(express.json());
 app.use(
-    cors({
-        origin: process.env.CORS_ORIGIN,
-        credentials: true,
+    express.json({
+        limit: '10mb',
     })
 );
-app.use(express.urlencoded({ extended: true }));
+
+app.use(
+    cors({
+        origin: 'http://localhost:3000', // Allow requests from this origin
+        methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+        credentials: true, // Allow credentials (e.g., cookies, authorization headers)
+    })
+);
+
+app.use(
+    express.urlencoded({
+        limit: '10mb',
+        extended: true,
+    })
+);
 app.use(express.static('public'));
 app.use(cookieParser());
 

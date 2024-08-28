@@ -3,6 +3,7 @@ import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
 import User from '../models/User.model.js';
 import gravatar from 'gravatar';
+import uploadOnCloudinary from '../utils/cloudinary.js';
 
 // Register user
 export const registerUser = asyncHanlder(async (req, res) => {
@@ -28,33 +29,34 @@ export const registerUser = asyncHanlder(async (req, res) => {
     if (!avatar) {
         throw new ApiError(400, 'Avatar Required');
     }
-    //* Data validation done by the user...
+    // Data validation done by the user...
 
-    res.status(200).json({ body: req.body, avatar });
-    // ================ PREVIOUS =================
-    // const existedUser = await User.findOne({ email });
-    // if (existedUser) {
-    //     throw new ApiError(409, 'Email already registered.');
-    // }
-    // const avatar = gravatar.url(email, {
-    //     s: '200',
-    //     r: 'pg',
-    //     d: 'identicon',
-    // });
-    // const user = {
-    //     name,
-    //     email,
-    //     password,
-    //     avatar,
-    // };
-    // await User.create(user);
-    // const userCreated = await User.findOne({ email }).select('-password');
-    // if (!userCreated) {
-    //     throw new ApiError(500, 'USER CANT REGISTERD TRY LATER.');
-    // }
-    // res.status(201).json(
-    //     new ApiResponse(201, 'User created successfuly', userCreated)
-    // );
+    const existedUser = await User.findOne({ email });
+    if (existedUser) {
+        throw new ApiError(409, 'Email already registered.');
+    }
+    // existed user check done
+
+    const avatarCloudinaryURL = await uploadOnCloudinary(avatar);
+    // uploadin to cloudinary done
+
+    const user = {
+        name,
+        email,
+        password,
+        avatar:
+            avatarCloudinaryURL ||
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoqWIPKg9kRQhn9r3qgpcRSACAXvg-dbTOWQiDN6b5ahLRZ-AU_ioL_uXv5Un0kNGPNhE&usqp=CAU',
+    };
+
+    await User.create(user);
+    const userCreated = await User.findOne({ email }).select('-password');
+    if (!userCreated) {
+        throw new ApiError(500, 'USER CANT REGISTERD TRY LATER.');
+    }
+    res.status(201).json(
+        new ApiResponse(201, 'User created successfuly', userCreated)
+    );
 });
 
 export const loginUser = asyncHanlder(async (req, res) => {

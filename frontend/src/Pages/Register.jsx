@@ -1,11 +1,14 @@
+import React, { useRef } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useFormik } from 'formik';
 import { validateRegister } from '../validation/registerValidator';
-import { Toaster } from 'react-hot-toast';
 import axios from 'axios';
+import { Toaster, toast } from 'react-hot-toast';
 
 function Register() {
+    const fileInputRef = useRef(null);
+
     // ==========================  FORMIK VALIDATION =================================
     const formik = useFormik({
         initialValues: {
@@ -17,21 +20,41 @@ function Register() {
         validate: validateRegister,
         validateOnBlur: false,
         validateOnChange: false,
-        onSubmit: async (values, resetForm) => {
+        onSubmit: async (values, { resetForm }) => {
             const formData = new FormData();
             formData.append('name', values.name.trim());
             formData.append('email', values.email.trim());
             formData.append('password', values.password.trim());
             formData.append('avatar', values.avatar);
 
-            await axios
-                .post('/api/users/register', formData, {
+            try {
+                const res = await axios.post('/api/users/register', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
-                })
-                .then((res) => console.log(res.data))
-                .catch((err) => console.log(err.response.data));
+                });
+
+                if (res.data.statusCode === 201) {
+                    toast.success('User registered successfully.');
+                    resetForm();
+                    if (fileInputRef.current) {
+                        fileInputRef.current.value = null; // Reset the file input
+                    }
+                }
+            } catch (err) {
+                if (err.response) {
+                    const statusCode = err.response.status;
+                    if (statusCode === 409) {
+                        toast.error('Email already registered.');
+                    } else if (statusCode === 500) {
+                        toast.error('Server Error, Try Later');
+                    } else {
+                        toast.error('An unexpected error occurred.');
+                    }
+                } else {
+                    toast.error('Network Error or Backend Not Reachable.');
+                }
+            }
         },
     });
 
@@ -47,7 +70,7 @@ function Register() {
                         {...formik.getFieldProps('name')}
                         type='text'
                         required
-                        placeholder='Enter email'
+                        placeholder='Enter name'
                     />
                 </Form.Group>
                 <Form.Group className='mb-3'>
@@ -77,6 +100,7 @@ function Register() {
                         required
                         name='file'
                         accept='image/*'
+                        ref={fileInputRef} // Attach the ref
                         onChange={(event) => {
                             formik.setFieldValue(
                                 'avatar',

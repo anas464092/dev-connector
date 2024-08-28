@@ -43,14 +43,14 @@ function Register() {
                     resetForm();
                     if (fileInputRef.current) {
                         fileInputRef.current.value = null; // Reset the file input
-                        setTimeout(() => {
-                            navigate('/login');
-                        }, 1000);
-                        localStorage.setItem(
-                            'registerUserId',
-                            JSON.stringify(res.data.data._id)
-                        );
                     }
+                    setTimeout(() => {
+                        navigate('/login');
+                    }, 1000);
+                    localStorage.setItem(
+                        'registerUserId',
+                        JSON.stringify(res.data.data._id)
+                    );
                 }
             } catch (err) {
                 if (err.response) {

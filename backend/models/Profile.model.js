@@ -14,9 +14,6 @@ const profileSchema = new Schema({
     company: {
         type: String,
     },
-    website: {
-        type: String,
-    },
     location: {
         type: String,
     },
@@ -30,9 +27,6 @@ const profileSchema = new Schema({
     bio: {
         type: String,
     },
-    githubUsername: {
-        type: String,
-    },
     experience: [
         {
             title: {
@@ -43,9 +37,6 @@ const profileSchema = new Schema({
                 type: String,
                 required: true,
             },
-            location: {
-                type: String,
-            },
             from: {
                 type: Date,
                 required: true,
@@ -53,22 +44,11 @@ const profileSchema = new Schema({
             to: {
                 type: Date,
             },
-            current: {
-                type: Boolean,
-                default: false,
-            },
-            description: {
-                type: String,
-            },
         },
     ],
     education: [
         {
             institute: {
-                type: String,
-                required: true,
-            },
-            degree: {
                 type: String,
                 required: true,
             },
@@ -83,20 +63,14 @@ const profileSchema = new Schema({
             to: {
                 type: Date,
             },
-            current: {
-                type: Boolean,
-                default: false,
-            },
-            description: {
-                type: String,
-            },
         },
     ],
     social: {
-        youtube: String,
+        github: String,
         instagram: String,
         linkedin: String,
-        github: String,
+        twitter: String,
+        website: String,
     },
     date: {
         type: Date,

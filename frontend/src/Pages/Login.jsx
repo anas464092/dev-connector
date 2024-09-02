@@ -1,15 +1,27 @@
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useFormik } from 'formik';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Spinner } from 'react-bootstrap';
-import toast, { Toaster } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { validateLogin } from '../validation/loginValidator';
-import axios from 'axios';
 import { useNavigate } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLoginMutation } from '../slices/userApiSlice';
+import { setCredentials } from '../slices/authSlice';
 
 function Login() {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const [login] = useLoginMutation();
+    const { userInfo } = useSelector((state) => state.auth);
+
+    useEffect(() => {
+        // if (userInfo) {
+        //     navigate('/dashboard');
+        // }
+    }, []);
+
     const [loading, setLoading] = useState(false);
     const formik = useFormik({
         initialValues: {
@@ -27,28 +39,16 @@ function Login() {
                 email: values.email,
                 password: values.password,
             };
+            // ApiCall
             try {
-                const res = await axios.post('/api/users/login', payload);
-                if (res.data.statusCode === 200) {
-                    toast.success('User login successfully.');
-                    resetForm();
-                    setTimeout(() => {
-                        navigate('/developers');
-                    }, 1000);
+                const res = await login(payload).unwrap();
+                dispatch(setCredentials({ ...res }));
+                if (res.statusCode === 200) {
+                    toast.success(res?.data?.message || 'Login Successfully');
                 }
+                resetForm();
             } catch (err) {
-                if (err.response) {
-                    const statusCode = err.response.status;
-                    if (statusCode === 400) {
-                        toast.error('Invalid credentials.');
-                    } else if (statusCode === 500) {
-                        toast.error('Server Error, Try Later');
-                    } else {
-                        toast.error('An unexpected error occurred.');
-                    }
-                } else {
-                    toast.error('Network Error or Backend Not Reachable.');
-                }
+                toast.error(err?.data?.message || err.message);
             }
             setLoading(false);
         },
@@ -56,7 +56,6 @@ function Login() {
 
     return (
         <>
-            <Toaster position='top-center' reverseOrder={false}></Toaster>
             <Form onSubmit={formik.handleSubmit}>
                 <Form.Group className='mb-3 mt-4'>
                     <Form.Label>Email address</Form.Label>

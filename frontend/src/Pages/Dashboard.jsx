@@ -31,9 +31,6 @@ export default function Dashboard() {
 
     return (
         <>
-            <Link className='btn btn-light my-3' to='/developers'>
-                Go Back
-            </Link>
             <div style={{ color: 'black' }}>
                 <Modal
                     style={{ marginTop: '120px', color: 'black' }}
@@ -107,6 +104,11 @@ export default function Dashboard() {
                                         style={{ width: '150px' }}
                                         fluid
                                     />
+                                    {/* ======================== NAME ==================== */}
+                                    <MDBCardText style={{ marginTop: '10px' }}>
+                                        <strong>Johnatan Smith</strong>
+                                    </MDBCardText>
+                                    {/* =========================== STATUS =========================== */}
                                     <Form.Control
                                         style={{
                                             textAlign: 'center',
@@ -114,16 +116,7 @@ export default function Dashboard() {
                                         }}
                                         type='text'
                                         value='status'
-                                        placeholder='Your website'
-                                    />
-                                    <Form.Control
-                                        style={{
-                                            textAlign: 'center',
-                                            marginTop: '3px',
-                                        }}
-                                        type='text'
-                                        value='company'
-                                        placeholder='Your website'
+                                        placeholder='Your Status'
                                     />
                                 </MDBCardBody>
                             </MDBCard>
@@ -204,42 +197,74 @@ export default function Dashboard() {
                             <MDBCard className='mb-4'>
                                 <MDBCardBody>
                                     <MDBRow>
+                                        {/* ================ USERNAME ============================ */}
                                         <MDBCol sm='3'>
-                                            <MDBCardText>Full Name</MDBCardText>
-                                        </MDBCol>
-                                        <MDBCol sm='9'>
-                                            <MDBCardText className='text-muted'>
-                                                Johnatan Smith
-                                            </MDBCardText>
-                                        </MDBCol>
-                                    </MDBRow>
-                                    <hr />
-                                    <MDBRow>
-                                        <MDBCol sm='3'>
-                                            <MDBCardText>Email</MDBCardText>
-                                        </MDBCol>
-                                        <MDBCol sm='9'>
-                                            <MDBCardText className='text-muted'>
-                                                example@example.com
-                                            </MDBCardText>
-                                        </MDBCol>
-                                    </MDBRow>
-                                    <hr />
-                                    <MDBRow>
-                                        <MDBCol sm='3'>
-                                            <MDBCardText>Phone</MDBCardText>
+                                            <MDBCardText>Uername</MDBCardText>
                                         </MDBCol>
                                         <MDBCol sm='9'>
                                             <MDBCardText className='text-muted'>
                                                 <Form.Control
                                                     type='text'
-                                                    value='000-000000-000'
-                                                    placeholder='Your linkedIn'
+                                                    value='arehman'
+                                                    placeholder='Username'
                                                 />
                                             </MDBCardText>
                                         </MDBCol>
                                     </MDBRow>
                                     <hr />
+                                    {/* =========================== BIO =========================== */}
+                                    <MDBRow>
+                                        <MDBCol sm='3'>
+                                            <MDBCardText>Bio</MDBCardText>
+                                        </MDBCol>
+                                        <MDBCol sm='9'>
+                                            <MDBCardText className='text-muted'>
+                                                <Form.Control
+                                                    as='textarea'
+                                                    value='I am a student of BESE at NUST'
+                                                    placeholder='Your bio'
+                                                    style={{
+                                                        height: '80px',
+                                                        color: 'black',
+                                                    }}
+                                                />
+                                            </MDBCardText>
+                                        </MDBCol>
+                                    </MDBRow>
+                                    <hr />
+                                    {/* ======================= COMPANY ====================== */}
+                                    <MDBRow>
+                                        <MDBCol sm='3'>
+                                            <MDBCardText>Company</MDBCardText>
+                                        </MDBCol>
+                                        <MDBCol sm='9'>
+                                            <MDBCardText className='text-muted'>
+                                                <Form.Control
+                                                    type='text'
+                                                    value='Google'
+                                                    placeholder='Your Organization'
+                                                />
+                                            </MDBCardText>
+                                        </MDBCol>
+                                    </MDBRow>
+                                    <hr />
+                                    {/* ============================= SKILLS ========================== */}
+                                    <MDBRow>
+                                        <MDBCol sm='3'>
+                                            <MDBCardText>Skills</MDBCardText>
+                                        </MDBCol>
+                                        <MDBCol sm='9'>
+                                            <MDBCardText className='text-muted'>
+                                                <Form.Control
+                                                    type='text'
+                                                    value='Skill1, Skill2, ...'
+                                                    placeholder='Your skills'
+                                                />
+                                            </MDBCardText>
+                                        </MDBCol>
+                                    </MDBRow>
+                                    <hr />
+                                    {/* =============================ADDRESS ============================== */}
                                     <MDBRow>
                                         <MDBCol sm='3'>
                                             <MDBCardText>Address</MDBCardText>
@@ -249,7 +274,7 @@ export default function Dashboard() {
                                                 <Form.Control
                                                     type='text'
                                                     value='Bay Area, San Francisco, CA'
-                                                    placeholder='Your linkedIn'
+                                                    placeholder='Your Address'
                                                 />
                                             </MDBCardText>
                                         </MDBCol>
@@ -257,7 +282,7 @@ export default function Dashboard() {
                                 </MDBCardBody>
                             </MDBCard>
 
-                            {/* Education ======================================================== */}
+                            {/*=========================== Education ============================= */}
                             <MDBRow>
                                 <MDBCol md='6'>
                                     <MDBCard className='mb-4 mb-md-0'>
@@ -299,7 +324,7 @@ export default function Dashboard() {
                                     </MDBCard>
                                 </MDBCol>
 
-                                {/* Experince ======================================================== */}
+                                {/*======================= Experince ================================= */}
                                 <MDBCol md='6'>
                                     <MDBCard className='mb-4 mb-md-0'>
                                         <MDBCardBody>
@@ -341,15 +366,13 @@ export default function Dashboard() {
                                 </MDBCol>
                             </MDBRow>
                         </MDBCol>
-                        <Button
-                            className='my-3 p-2'
-                            onClick={() =>
-                                console.log('Update profile clicked')
-                            }
-                        >
-                            Update Profile
-                        </Button>
                     </MDBRow>
+                    <Button
+                        className='mt-4 p-2'
+                        onClick={() => console.log('Update profile clicked')}
+                    >
+                        Update Profile
+                    </Button>
                 </MDBContainer>
             </section>
         </>

@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import { useFormik } from 'formik';
 import { validateRegister } from '../validation/registerValidator';
 import axios from 'axios';
-import { Toaster, toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router';
 
 function Register() {
@@ -74,7 +74,6 @@ function Register() {
 
     return (
         <>
-            <Toaster position='top-center' reverseOrder={false}></Toaster>
             <Form onSubmit={formik.handleSubmit} className='my-4'>
                 <Form.Group className='mb-3'>
                     <Form.Label style={{ color: 'aqua' }}>Full Name</Form.Label>

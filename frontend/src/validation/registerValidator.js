@@ -1,4 +1,4 @@
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 // username validation
 function nameVerify(error = {}, values) {

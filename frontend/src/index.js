@@ -15,6 +15,8 @@ import Protected from './components/Protected';
 import AddPost from './Pages/AddPost';
 import ProfilePage from './Pages/ProfilePage';
 import Dashboard from './Pages/Dashboard';
+import store from './store/store';
+import { Provider } from 'react-redux';
 
 const Root = () => (
     <Router>
@@ -36,4 +38,8 @@ const Root = () => (
     </Router>
 );
 
-ReactDOM.createRoot(document.getElementById('root')).render(<Root />);
+ReactDOM.createRoot(document.getElementById('root')).render(
+    <Provider store={store}>
+        <Root />
+    </Provider>
+);

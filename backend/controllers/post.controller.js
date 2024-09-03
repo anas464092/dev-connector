@@ -47,7 +47,7 @@ export const getPost = asyncHandler(async (req, res) => {
     if (!id) {
         throw new ApiError(400, 'Id is required for finding specific post.');
     }
-    const post = await Post.findById(id);
+    const post = await Post.findById(id).populate('author', 'name avatar _id');
     if (!post) {
         throw new ApiError(404, 'Post not found with this id.');
     }

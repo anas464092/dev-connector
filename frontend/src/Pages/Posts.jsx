@@ -9,9 +9,8 @@ import DOMPurify from 'dompurify'; // Import DOMPurify for HTML sanitization
 function Posts() {
     const [allPosts, { isLoading }] = useAllPostsMutation();
     const navigate = useNavigate();
-    const showPost = (postId) => {
-        console.log(postId);
-        navigate(`/post/${postId}`);
+    const showPost = (id) => {
+        navigate(`/post/${id}`);
     };
     const [posts, setPosts] = useState([]);
 
@@ -111,11 +110,6 @@ function Posts() {
                                         </ListGroup.Item>
                                         <ListGroup.Item>
                                             <div
-                                                style={{
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    whiteSpace: 'nowrap',
-                                                }}
                                                 dangerouslySetInnerHTML={{
                                                     __html: DOMPurify.sanitize(
                                                         post.content

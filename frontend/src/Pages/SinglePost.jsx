@@ -1,22 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { FloatingLabel, Form, Modal } from 'react-bootstrap';
-import postData from '../data/posts.json';
+import { FloatingLabel, Form, Modal, Spinner } from 'react-bootstrap';
 import { Button, Col, Image, ListGroup, Row } from 'react-bootstrap';
 import { BiSolidLike, BiSolidDislike } from 'react-icons/bi';
+import { useGetPostMutation } from '../slices/postApiSlice';
+import { toast } from 'react-toastify';
+import DOMPurify from 'dompurify'; // Import DOMPurify for HTML sanitization
 
 function SinglePost() {
-    const { id: postId } = useParams();
+    const { id } = useParams();
     const [post, setPost] = useState({});
     const [commentContent, setCommentContent] = useState('');
+    const [getPost, { isLoading }] = useGetPostMutation();
 
     useEffect(() => {
-        // console.log(postId);
-        const postResult = postData.posts[postId - 1];
-        // console.log(postResult);
-        setPost(postResult);
-        // console.log(post);
-    }, [postId]);
+        const fetchPost = async () => {
+            try {
+                const res = await getPost(id).unwrap();
+                setPost(res.data);
+                console.log(res.data);
+            } catch (err) {
+                toast.error(err?.data?.message || 'Somrthing went wrong');
+            }
+        };
+        fetchPost();
+    }, [id]);
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -32,11 +40,32 @@ function SinglePost() {
 
     return (
         <>
-            {post && post.profile && (
+            {isLoading ? (
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '50px 0px',
+                    }}
+                >
+                    <Spinner
+                        animation='border'
+                        role='status'
+                        style={{
+                            width: '100px',
+                            height: '100px',
+                        }}
+                    />
+                </div>
+            ) : (
                 <>
                     <div style={{ color: 'black' }}>
                         <Modal
-                            style={{ marginTop: '120px', color: 'black' }}
+                            style={{
+                                marginTop: '120px',
+                                color: 'black',
+                            }}
                             show={show}
                             onHide={handleClose}
                         >
@@ -84,7 +113,7 @@ function SinglePost() {
                         <Col md={6}>
                             <Image
                                 className='rounded'
-                                src={post.image}
+                                src={post?.postImage}
                                 alt='post image'
                                 fluid
                             />
@@ -96,14 +125,16 @@ function SinglePost() {
                                         <Col xs='auto'>
                                             <Image
                                                 className='rounded'
-                                                src={post.profile.profileImage}
+                                                src={post?.author?.avatar}
                                                 alt='profile image'
                                                 fluid
-                                                style={{ width: '60px' }}
+                                                style={{
+                                                    width: '60px',
+                                                }}
                                             />
                                         </Col>
                                         <Col>
-                                            <h3>{post.profile.name}</h3>
+                                            <h3>{post?.author?.name}</h3>
                                         </Col>
                                     </Row>
                                 </ListGroup.Item>
@@ -116,17 +147,18 @@ function SinglePost() {
                                             <h3>
                                                 <BiSolidLike />
                                             </h3>
-                                            <span>{post.likes}</span>
-                                        </Col>
-                                        <Col>
-                                            <h3>
-                                                <BiSolidDislike />
-                                            </h3>
+                                            <span>{post?.likes?.length}</span>
                                         </Col>
                                     </Row>
                                 </ListGroup.Item>
                                 <ListGroup.Item>
-                                    {post.description}
+                                    <div
+                                        dangerouslySetInnerHTML={{
+                                            __html: DOMPurify.sanitize(
+                                                post.content
+                                            ),
+                                        }}
+                                    />
                                 </ListGroup.Item>
                             </ListGroup>
                         </Col>
@@ -141,7 +173,7 @@ function SinglePost() {
                                 </Button>
                             </Col>
                         </Row>
-                        <Row style={{ marginTop: '10px' }}>
+                        {/* <Row style={{ marginTop: '10px' }}>
                             <ListGroup>
                                 <ListGroup.Item>
                                     <Row className='align-items-center'>
@@ -151,7 +183,9 @@ function SinglePost() {
                                                 src={post.profile.profileImage}
                                                 alt='profile image'
                                                 fluid
-                                                style={{ width: '40px' }}
+                                                style={{
+                                                    width: '40px',
+                                                }}
                                             />
                                         </Col>
                                         <Col>
@@ -174,7 +208,9 @@ function SinglePost() {
                                                 src={post.profile.profileImage}
                                                 alt='profile image'
                                                 fluid
-                                                style={{ width: '40px' }}
+                                                style={{
+                                                    width: '40px',
+                                                }}
                                             />
                                         </Col>
                                         <Col>
@@ -186,7 +222,7 @@ function SinglePost() {
                                     {post.description}
                                 </ListGroup.Item>
                             </ListGroup>
-                        </Row>
+                        </Row> */}
                     </Row>
                 </>
             )}

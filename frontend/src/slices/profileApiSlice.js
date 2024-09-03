@@ -23,6 +23,19 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 method: 'DELETE',
             }),
         }),
+        addExperience: builder.mutation({
+            query: (data) => ({
+                url: `${PROFILE_URL}/experience`,
+                method: 'POST',
+                body: data,
+            }),
+        }),
+        deleteExperience: builder.mutation({
+            query: (id) => ({
+                url: `${PROFILE_URL}/experience/${id}`,
+                method: 'DELETE',
+            }),
+        }),
     }),
 });
 
@@ -30,4 +43,6 @@ export const {
     useGetCurrentMutation,
     useAddEducationMutation,
     useDeleteEducationMutation,
+    useAddExperienceMutation,
+    useDeleteExperienceMutation,
 } = userApiSlice;

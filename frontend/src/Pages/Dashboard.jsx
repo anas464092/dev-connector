@@ -26,6 +26,8 @@ import {
     useGetCurrentMutation,
     useDeleteEducationMutation,
     useAddEducationMutation,
+    useDeleteExperienceMutation,
+    useAddExperienceMutation,
 } from '../slices/profileApiSlice';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -72,8 +74,6 @@ export default function Dashboard() {
     const [twitter, setTwitter] = useState(currentData?.social?.twitter || '');
     const [website, setWebsite] = useState(currentData?.social?.website || '');
 
-    const [education, setEducation] = useState(currentData?.education || []);
-
     useEffect(() => {
         if (currentData) {
             setStatus(currentData.status);
@@ -87,13 +87,13 @@ export default function Dashboard() {
             setLinkedin(currentData.social.linkedin);
             setTwitter(currentData.social.twitter);
             setWebsite(currentData.social.website);
-            setEducation(currentData.education);
         }
-    }, [currentData, education]);
+    }, [currentData]);
     // ===============================================================
 
     // ====================== ADDING EDUCATION / EXPEREINCE =================
     const [addEducation] = useAddEducationMutation();
+    const [addExperience] = useAddExperienceMutation();
     const [addingFieldLoading, setAddingFieldLoading] = useState(false);
     const [addingOrganization, setAddingOrganization] = useState('');
     const [addingStatus, setAddingStatus] = useState('');
@@ -111,16 +111,23 @@ export default function Dashboard() {
                 };
                 await addEducation(payload).unwrap();
             } else {
+                const payload = {
+                    company: addingOrganization,
+                    title: addingStatus,
+                    from: fromDate,
+                    to: toDate,
+                };
+                await addExperience(payload).unwrap();
             }
+            setAddingOrganization('');
+            setAddingStatus('');
+            setFromDate('');
+            setToDate('');
+            setShow(false);
         } catch (err) {
             toast.error(err?.data?.message);
         }
         setAddingFieldLoading(false);
-        setAddingOrganization('');
-        setAddingStatus('');
-        setFromDate('');
-        setToDate('');
-        setShow(false);
         window.location.reload(true);
     };
 
@@ -137,6 +144,22 @@ export default function Dashboard() {
             console.log(err);
         }
         setDeletingEducationId(null);
+    };
+    // =================================================================
+
+    // ===================== DELETE EXPERIENCE =========================
+    const [deleteExp] = useDeleteExperienceMutation();
+    const [deletingExpId, setDeletingExpId] = useState(null);
+    const deleteExperience = async (id) => {
+        setDeletingExpId(id);
+        try {
+            await deleteExp(id).unwrap();
+            window.location.reload(true);
+        } catch (err) {
+            toast.error(err?.data?.message || 'Unable to delete');
+            console.log(err);
+        }
+        setDeletingExpId(null);
     };
     // =================================================================
 
@@ -506,67 +529,73 @@ export default function Dashboard() {
                                                 </MDBCol>
                                             </MDBRow>
                                             <hr />
-                                            {education?.map((edu) => (
-                                                <>
-                                                    <MDBRow key={Date.now()}>
-                                                        <MDBCol sm='6'>
-                                                            <MDBCardText>
-                                                                {edu.institute}
-                                                            </MDBCardText>
-                                                            <MDBCardText className='text-muted'>
-                                                                {edu.degree}
-                                                            </MDBCardText>
-                                                        </MDBCol>
-                                                        <MDBCol sm='6'>
-                                                            <MDBCardText className='text-muted'>
-                                                                {new Date(
-                                                                    edu.from
-                                                                ).toLocaleDateString()}
-                                                            </MDBCardText>
-                                                            <MDBCardText className='text-muted'>
-                                                                {new Date(
-                                                                    edu.to
-                                                                ).toLocaleDateString()}
-                                                            </MDBCardText>
-                                                        </MDBCol>
-                                                        <Button
-                                                            id={edu._id}
-                                                            variant='secondary'
-                                                            style={{
-                                                                marginTop:
-                                                                    '10px',
-                                                                width: '40px',
-                                                                marginLeft:
-                                                                    '10px',
-                                                            }}
-                                                            disabled={
-                                                                deletingEducationId ===
-                                                                edu._id
-                                                            }
-                                                            onClick={() =>
-                                                                deleteEducation(
-                                                                    edu._id
-                                                                )
-                                                            }
+                                            {currentData?.education?.map(
+                                                (edu) => (
+                                                    <>
+                                                        <MDBRow
+                                                            key={Date.now()}
                                                         >
-                                                            {deletingEducationId ===
-                                                            edu._id ? (
-                                                                <Spinner
-                                                                    animation='border'
-                                                                    role='status'
-                                                                    style={{
-                                                                        width: '20px',
-                                                                        height: '20px',
-                                                                    }}
-                                                                />
-                                                            ) : (
-                                                                <MdDelete />
-                                                            )}
-                                                        </Button>
-                                                    </MDBRow>
-                                                    <hr />
-                                                </>
-                                            ))}
+                                                            <MDBCol sm='6'>
+                                                                <MDBCardText>
+                                                                    {
+                                                                        edu.institute
+                                                                    }
+                                                                </MDBCardText>
+                                                                <MDBCardText className='text-muted'>
+                                                                    {edu.degree}
+                                                                </MDBCardText>
+                                                            </MDBCol>
+                                                            <MDBCol sm='6'>
+                                                                <MDBCardText className='text-muted'>
+                                                                    {new Date(
+                                                                        edu.from
+                                                                    ).toLocaleDateString()}
+                                                                </MDBCardText>
+                                                                <MDBCardText className='text-muted'>
+                                                                    {new Date(
+                                                                        edu.to
+                                                                    ).toLocaleDateString()}
+                                                                </MDBCardText>
+                                                            </MDBCol>
+                                                            <Button
+                                                                id={edu._id}
+                                                                variant='secondary'
+                                                                style={{
+                                                                    marginTop:
+                                                                        '10px',
+                                                                    width: '40px',
+                                                                    marginLeft:
+                                                                        '10px',
+                                                                }}
+                                                                disabled={
+                                                                    deletingEducationId ===
+                                                                    edu._id
+                                                                }
+                                                                onClick={() =>
+                                                                    deleteEducation(
+                                                                        edu._id
+                                                                    )
+                                                                }
+                                                            >
+                                                                {deletingEducationId ===
+                                                                edu._id ? (
+                                                                    <Spinner
+                                                                        animation='border'
+                                                                        role='status'
+                                                                        style={{
+                                                                            width: '20px',
+                                                                            height: '20px',
+                                                                        }}
+                                                                    />
+                                                                ) : (
+                                                                    <MdDelete />
+                                                                )}
+                                                            </Button>
+                                                        </MDBRow>
+                                                        <hr />
+                                                    </>
+                                                )
+                                            )}
                                         </MDBCardBody>
                                     </MDBCard>
                                 </MDBCol>
@@ -619,6 +648,7 @@ export default function Dashboard() {
                                                                 </MDBCardText>
                                                             </MDBCol>
                                                             <Button
+                                                                id={exp._id}
                                                                 variant='secondary'
                                                                 style={{
                                                                     marginTop:
@@ -627,8 +657,29 @@ export default function Dashboard() {
                                                                     marginLeft:
                                                                         '10px',
                                                                 }}
+                                                                disabled={
+                                                                    deletingExpId ===
+                                                                    exp._id
+                                                                }
+                                                                onClick={() =>
+                                                                    deleteExperience(
+                                                                        exp._id
+                                                                    )
+                                                                }
                                                             >
-                                                                <MdDelete />
+                                                                {deletingExpId ===
+                                                                exp._id ? (
+                                                                    <Spinner
+                                                                        animation='border'
+                                                                        role='status'
+                                                                        style={{
+                                                                            width: '20px',
+                                                                            height: '20px',
+                                                                        }}
+                                                                    />
+                                                                ) : (
+                                                                    <MdDelete />
+                                                                )}
                                                             </Button>
                                                         </MDBRow>
                                                         <hr />

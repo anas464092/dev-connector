@@ -43,6 +43,12 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 body: data,
             }),
         }),
+        allProfiles: builder.mutation({
+            query: () => ({
+                url: `${PROFILE_URL}/all`,
+                method: 'GET',
+            }),
+        }),
     }),
 });
 
@@ -53,4 +59,5 @@ export const {
     useAddExperienceMutation,
     useDeleteExperienceMutation,
     useUpdateProfileMutation,
+    useAllProfilesMutation,
 } = userApiSlice;

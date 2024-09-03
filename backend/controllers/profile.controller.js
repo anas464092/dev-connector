@@ -21,36 +21,29 @@ export const currentUserProfile = asyncHandler(async (req, res) => {
 export const createUserProfile = asyncHandler(async (req, res) => {
     const userProfile = {};
     userProfile.user = req.user._id;
-
     // Validation
     if (!req.body.handle || req.body.handle.trim() === '') {
         throw new ApiError(400, 'Username required.');
     }
     userProfile.handle = req.body.handle;
-
     if (req.body.company || req.body.company === '') {
         userProfile.company = req.body.company;
     }
-
     if (req.body.location || req.body.location === '') {
         userProfile.location = req.body.location;
     }
-
     if (!req.body.status || req.body.status.trim() === '') {
         throw new ApiError(400, 'Status required.');
     }
     userProfile.status = req.body.status;
-
     if (typeof req.body.skills !== 'undefined') {
         userProfile.skills = req.body.skills
             .split(',')
             .map((skill) => skill.trim());
     }
-
     if (req.body.bio) userProfile.bio = req.body.bio;
     if (req.body.githubUsername)
         userProfile.githubUsername = req.body.githubUsername;
-
     // Social fields
     userProfile.social = {};
     if (req.body.github || req.body.github === '')
@@ -63,31 +56,23 @@ export const createUserProfile = asyncHandler(async (req, res) => {
         userProfile.social.twitter = req.body.twitter;
     if (req.body.website || req.body.website === '')
         userProfile.social.website = req.body.website;
-
     const profileChecker = await Profile.findOne({ user: userProfile.user });
-
     if (profileChecker) {
         // Update the profile with all fields including social fields
-        console.log(userProfile);
         const profile = await Profile.findOneAndUpdate(
             { user: userProfile.user },
             { $set: { ...userProfile } }, // Spread all fields, including social
             { new: true }
         ).populate('user', ['name', 'avatar']);
-
         return res
             .status(200)
             .json(new ApiResponse(200, 'User profile updated.', profile));
     } else {
         // Create the profile with all fields including social fields
-        console.log(userProfile);
-
         await Profile.create(userProfile);
-
         const profile = await Profile.findOne({
             user: userProfile.user,
         }).populate('user', ['name', 'avatar']);
-
         return res
             .status(200)
             .json(new ApiResponse(200, 'User profile created.', profile));

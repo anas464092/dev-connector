@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
     MDBCol,
     MDBContainer,
@@ -11,9 +11,14 @@ import {
     MDBListGroup,
     MDBListGroupItem,
 } from 'mdb-react-ui-kit';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 export default function ProfilePage() {
+    const location = useLocation();
+    const { _id } = location.state || {};
+    useEffect(() => {
+        console.log(_id);
+    }, []);
     return (
         <>
             <Link className='btn btn-light my-3' to='/developers'>

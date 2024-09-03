@@ -36,6 +36,13 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 method: 'DELETE',
             }),
         }),
+        updateProfile: builder.mutation({
+            query: (data) => ({
+                url: `${PROFILE_URL}/`,
+                method: 'POST',
+                body: data,
+            }),
+        }),
     }),
 });
 
@@ -45,4 +52,5 @@ export const {
     useDeleteEducationMutation,
     useAddExperienceMutation,
     useDeleteExperienceMutation,
+    useUpdateProfileMutation,
 } = userApiSlice;

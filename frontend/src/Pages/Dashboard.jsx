@@ -28,6 +28,7 @@ import {
     useAddEducationMutation,
     useDeleteExperienceMutation,
     useAddExperienceMutation,
+    useUpdateProfileMutation,
 } from '../slices/profileApiSlice';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -162,6 +163,47 @@ export default function Dashboard() {
         setDeletingExpId(null);
     };
     // =================================================================
+
+    // ===================== UPDATE PROFILE ===========================
+    const [updateProfileLoading, setUpdateProfileLoading] = useState(false);
+    const [updateProfileApi] = useUpdateProfileMutation();
+    const updateProfileHandler = async () => {
+        setUpdateProfileLoading(true);
+        try {
+            const payload = {
+                handle: username,
+                location: location,
+                status: status,
+                skills: skills,
+                bio: bio,
+                company: company,
+                github: github,
+                instagram: instagram,
+                linkedin: linkedin,
+                twitter: twitter,
+                website: website,
+            };
+            const res = await updateProfileApi(payload).unwrap();
+            setCurrentData(res.data);
+            toast.success('Profile updated');
+        } catch (error) {
+            if (
+                error?.status === 500 &&
+                error?.data?.message.includes('E11000 duplicate key error')
+            ) {
+                toast.error(
+                    'This username is already in use. Please choose a different one.'
+                );
+            } else {
+                toast.error(
+                    error?.data?.message ||
+                        'An error occurred. Please try again.'
+                );
+            }
+        }
+
+        setUpdateProfileLoading(false);
+    };
 
     return (
         <>
@@ -541,7 +583,7 @@ export default function Dashboard() {
                                                                         edu.institute
                                                                     }
                                                                 </MDBCardText>
-                                                                <MDBCardText className='text-muted'>
+                                                                <MDBCardText>
                                                                     {edu.degree}
                                                                 </MDBCardText>
                                                             </MDBCol>
@@ -631,7 +673,7 @@ export default function Dashboard() {
                                                                         exp.company
                                                                     }
                                                                 </MDBCardText>
-                                                                <MDBCardText className='text-muted'>
+                                                                <MDBCardText>
                                                                     {exp.title}
                                                                 </MDBCardText>
                                                             </MDBCol>
@@ -694,9 +736,14 @@ export default function Dashboard() {
                     </MDBRow>
                     <Button
                         className='mt-4 p-2'
-                        onClick={() => console.log('Update profile clicked')}
+                        disabled={updateProfileLoading}
+                        onClick={updateProfileHandler}
                     >
-                        Update Profile
+                        {updateProfileLoading ? (
+                            <Spinner animation='border' role='status' />
+                        ) : (
+                            <>Update Profile</>
+                        )}
                     </Button>
                 </MDBContainer>
             </section>

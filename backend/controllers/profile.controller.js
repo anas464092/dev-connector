@@ -24,19 +24,15 @@ export const createUserProfile = asyncHandler(async (req, res) => {
 
     // Validation
     if (!req.body.handle || req.body.handle.trim() === '') {
-        throw new ApiError(400, 'Handle required.');
+        throw new ApiError(400, 'Username required.');
     }
     userProfile.handle = req.body.handle;
 
-    if (req.body.company && req.body.company.trim() !== '') {
+    if (req.body.company || req.body.company === '') {
         userProfile.company = req.body.company;
     }
 
-    if (req.body.website && req.body.website.trim() !== '') {
-        userProfile.website = req.body.website;
-    }
-
-    if (req.body.location && req.body.location.trim() !== '') {
+    if (req.body.location || req.body.location === '') {
         userProfile.location = req.body.location;
     }
 
@@ -57,11 +53,16 @@ export const createUserProfile = asyncHandler(async (req, res) => {
 
     // Social fields
     userProfile.social = {};
-    if (req.body.github) userProfile.social.github = req.body.github;
-    if (req.body.instagram) userProfile.social.instagram = req.body.instagram;
-    if (req.body.linkedin) userProfile.social.linkedin = req.body.linkedin;
-    if (req.body.twitter) userProfile.social.twitter = req.body.twitter;
-    if (req.body.website) userProfile.social.website = req.body.website;
+    if (req.body.github || req.body.github === '')
+        userProfile.social.github = req.body.github;
+    if (req.body.instagram || req.body.instagram === '')
+        userProfile.social.instagram = req.body.instagram;
+    if (req.body.linkedin || req.body.linkedin === '')
+        userProfile.social.linkedin = req.body.linkedin;
+    if (req.body.twitter || req.body.twitter === '')
+        userProfile.social.twitter = req.body.twitter;
+    if (req.body.website || req.body.website === '')
+        userProfile.social.website = req.body.website;
 
     const profileChecker = await Profile.findOne({ user: userProfile.user });
 

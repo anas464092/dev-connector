@@ -53,6 +53,9 @@ function Header() {
                             </LinkContainer>
                             {userInfo ? (
                                 <>
+                                    <LinkContainer to='posts'>
+                                        <Nav.Link>All Posts</Nav.Link>
+                                    </LinkContainer>
                                     <LinkContainer to='/add-post'>
                                         <Nav.Link>Add Post</Nav.Link>
                                     </LinkContainer>

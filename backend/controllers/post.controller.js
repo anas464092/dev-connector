@@ -34,7 +34,7 @@ export const createPost = asyncHandler(async (req, res) => {
 
 // Get all post....
 export const getAllPosts = asyncHandler(async (req, res) => {
-    const allPosts = await Post.find();
+    const allPosts = await Post.find().populate('author', 'name avatar');
     if (!allPosts) {
         throw new ApiError(404, 'No post found.');
     }

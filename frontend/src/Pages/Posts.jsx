@@ -1,83 +1,135 @@
-import React from 'react';
-import { Col, Image, ListGroup, Row } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Col, Image, ListGroup, Row, Spinner } from 'react-bootstrap';
 import { BiSolidLike, BiSolidDislike } from 'react-icons/bi';
-import { Link } from 'react-router-dom';
-import postData from '../data/posts.json';
 import { useNavigate } from 'react-router-dom';
+import { useAllPostsMutation } from '../slices/postApiSlice';
+import { toast } from 'react-toastify';
+import DOMPurify from 'dompurify'; // Import DOMPurify for HTML sanitization
 
 function Posts() {
+    const [allPosts, { isLoading }] = useAllPostsMutation();
     const navigate = useNavigate();
     const showPost = (postId) => {
         console.log(postId);
         navigate(`/post/${postId}`);
     };
+    const [posts, setPosts] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await allPosts().unwrap();
+                setPosts(res.data);
+            } catch (err) {
+                toast.error(err?.data?.message || "Can't fetch posts");
+            }
+        };
+        fetchData();
+    }, [allPosts]);
 
     return (
         <>
-            <Link className='btn btn-light my-3' to='/'>
-                Go Back
-            </Link>
-            {postData.posts.map((post) => (
-                <Row
-                    key={post.id}
-                    className='rounded'
+            {isLoading ? (
+                <div
                     style={{
-                        background: 'white',
-                        padding: '20px 10px',
-                        marginTop: '20px',
-                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '50px 0px',
                     }}
-                    onClick={() => showPost(post.id)}
                 >
-                    <Col md={6}>
-                        <Image
-                            className='rounded'
-                            src={post.image}
-                            alt='post image'
-                            fluid
-                        />
-                    </Col>
-                    <Col md={6}>
-                        <ListGroup>
-                            <ListGroup.Item>
-                                <Row className='align-items-center'>
-                                    <Col xs='auto'>
-                                        <Image
-                                            className='rounded'
-                                            src={post.profile.profileImage}
-                                            alt='profile image'
-                                            fluid
-                                            style={{ width: '60px' }}
-                                        />
-                                    </Col>
-                                    <Col>
-                                        <h3>{post.profile.name}</h3>
-                                    </Col>
-                                </Row>
-                            </ListGroup.Item>
-                            <ListGroup.Item>
-                                <Row className='align-items-center'>
-                                    <Col
-                                        xs='auto'
-                                        className='d-flex flex-row gap-1 align-items-center'
-                                    >
-                                        <h3>
-                                            <BiSolidLike />
-                                        </h3>
-                                        <span>{post.likes}</span>
-                                    </Col>
-                                    <Col>
-                                        <h3>
-                                            <BiSolidDislike />
-                                        </h3>
-                                    </Col>
-                                </Row>
-                            </ListGroup.Item>
-                            <ListGroup.Item>{post.description}</ListGroup.Item>
-                        </ListGroup>
-                    </Col>
-                </Row>
-            ))}
+                    <Spinner
+                        animation='border'
+                        role='status'
+                        style={{
+                            width: '100px',
+                            height: '100px',
+                        }}
+                    />
+                </div>
+            ) : (
+                <>
+                    {posts.length === 0 ? (
+                        <h1>No posts added</h1>
+                    ) : (
+                        posts.map((post) => (
+                            <Row
+                                key={post._id}
+                                className='rounded'
+                                style={{
+                                    background: 'white',
+                                    padding: '20px 10px',
+                                    marginTop: '20px',
+                                }}
+                            >
+                                <Col md={6}>
+                                    <Image
+                                        className='rounded'
+                                        src={post.postImage}
+                                        alt='post image'
+                                        fluid
+                                        onClick={() => showPost(post._id)}
+                                        style={{
+                                            cursor: 'pointer',
+                                        }}
+                                    />
+                                </Col>
+                                <Col md={6}>
+                                    <ListGroup>
+                                        <ListGroup.Item>
+                                            <Row className='align-items-center'>
+                                                <Col xs='auto'>
+                                                    <Image
+                                                        className='rounded'
+                                                        src={post.author.avatar}
+                                                        alt='profile image'
+                                                        fluid
+                                                        style={{
+                                                            width: '60px',
+                                                        }}
+                                                    />
+                                                </Col>
+                                                <Col>
+                                                    <h3>{post.author.name}</h3>
+                                                </Col>
+                                            </Row>
+                                        </ListGroup.Item>
+                                        <ListGroup.Item>
+                                            <Row className='align-items-center'>
+                                                <Col
+                                                    xs='auto'
+                                                    className='d-flex flex-row gap-1 align-items-center'
+                                                >
+                                                    <h3>
+                                                        <BiSolidLike />
+                                                    </h3>
+                                                    <span>
+                                                        {post.likes.length}
+                                                    </span>
+                                                </Col>
+                                            </Row>
+                                        </ListGroup.Item>
+                                        <ListGroup.Item>
+                                            <div
+                                                style={{
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    whiteSpace: 'nowrap',
+                                                }}
+                                                dangerouslySetInnerHTML={{
+                                                    __html: DOMPurify.sanitize(
+                                                        post.content
+                                                    ),
+                                                }}
+                                            />
+                                        </ListGroup.Item>
+                                    </ListGroup>
+                                </Col>
+                            </Row>
+                        ))
+                    )}
+                </>
+            )}
         </>
     );
 }

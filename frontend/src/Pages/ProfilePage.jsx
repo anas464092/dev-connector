@@ -7,7 +7,6 @@ import {
     MDBCardText,
     MDBCardBody,
     MDBCardImage,
-    MDBIcon,
     MDBListGroup,
     MDBListGroupItem,
 } from 'mdb-react-ui-kit';
@@ -35,7 +34,7 @@ export default function ProfilePage() {
             }
         };
         fetchData();
-    }, []);
+    }, [_id]);
     return (
         <>
             {isLoading ? (

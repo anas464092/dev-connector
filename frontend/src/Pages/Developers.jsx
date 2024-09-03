@@ -34,7 +34,7 @@ function Developers() {
             }
         };
         fetchData();
-    }, []);
+    }, [allUsers]); 
 
     return (
         <>

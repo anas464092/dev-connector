@@ -15,10 +15,7 @@ const postsRoute = express.Router();
 postsRoute.post(
     '/',
     verifyJWT,
-    upload.fields([
-        { name: 'postImage', maxCount: 1 },
-        { name: 'postVideo', maxCount: 1 },
-    ]),
+    upload.fields([{ name: 'postImage', maxCount: 1 }]),
     createPost
 );
 postsRoute.get('/', getAllPosts);

@@ -53,13 +53,16 @@ function Header() {
                             </LinkContainer>
                             {userInfo ? (
                                 <>
+                                    <LinkContainer to='/add-post'>
+                                        <Nav.Link>Add Post</Nav.Link>
+                                    </LinkContainer>
                                     <NavDropdown
                                         title={
                                             <Image
                                                 style={{
                                                     borderRadius: '100%',
                                                     width: '50px',
-                                                    height:'50px'
+                                                    height: '50px',
                                                 }}
                                                 src={userInfo.avatar}
                                             />

@@ -11,16 +11,7 @@ const postSchema = new Schema(
             required: true,
             minlength: [20, 'Content is too short.'],
         },
-        name: {
-            type: String,
-        },
-        avatar: {
-            type: String,
-        },
         postImage: {
-            type: String,
-        },
-        postVideo: {
             type: String,
         },
         likes: [
@@ -40,12 +31,6 @@ const postSchema = new Schema(
                 text: {
                     type: String,
                     required: [true, 'Comment cant be empty.'],
-                },
-                name: {
-                    type: String,
-                },
-                avatar: {
-                    type: String,
                 },
                 date: {
                     type: Date,

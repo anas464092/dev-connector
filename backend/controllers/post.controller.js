@@ -8,17 +8,9 @@ import User from '../models/User.model.js';
 // Create posts....
 export const createPost = asyncHandler(async (req, res) => {
     const { _id } = req.user;
-    const { content, name, avatar } = req.body;
+    const { content } = req.body;
     if (!content) {
         throw new ApiError(400, 'Content is required for the post.');
-    }
-    let postVideoPath;
-    if (
-        req.files &&
-        Array.isArray(req.files.postVideo) &&
-        req.files.postVideo.length > 0
-    ) {
-        postVideoPath = req.files.postVideo[0].path;
     }
     let postImagePath;
     if (
@@ -29,12 +21,10 @@ export const createPost = asyncHandler(async (req, res) => {
         postImagePath = req.files.postImage[0].path;
     }
     const postImageURL = await uploadOnCloudinary(postImagePath);
-    const postVideoURL = await uploadOnCloudinary(postVideoPath);
     const post = await Post.create({
         author: _id,
         content,
         postImage: postImageURL || '',
-        postVideo: postVideoURL || '',
     });
     if (!post) {
         throw new ApiError(500, 'Error occur while creating post.');

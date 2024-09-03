@@ -59,6 +59,7 @@ function Header() {
                                                 style={{
                                                     borderRadius: '100%',
                                                     width: '50px',
+                                                    height:'50px'
                                                 }}
                                                 src={userInfo.avatar}
                                             />

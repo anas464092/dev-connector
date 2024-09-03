@@ -12,8 +12,8 @@ const userRoute = express.Router();
 
 // REGISTER USER -----> PUBLIC -------> USUNG MULTER
 userRoute.post('/register', upload.single('avatar'), registerUser); // public
-
 userRoute.post('/login', loginUser); // public
+
 userRoute.get('/current', verifyJWT, getCurrentUser); // private
 userRoute.get('/logout', verifyJWT, logoutUser); // private
 

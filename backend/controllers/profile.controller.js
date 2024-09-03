@@ -12,7 +12,7 @@ export const currentUserProfile = asyncHandler(async (req, res) => {
         ['name', 'avatar']
     );
     if (!currentProfile) {
-        throw new ApiError(404, 'No profile for this user.');
+        throw new ApiResponse(404, 'No profile for this user.');
     }
     res.status(200).json(new ApiResponse(200, 'Profile found', currentProfile));
 });
@@ -21,46 +21,75 @@ export const currentUserProfile = asyncHandler(async (req, res) => {
 export const createUserProfile = asyncHandler(async (req, res) => {
     const userProfile = {};
     userProfile.user = req.user._id;
-    if (!req.body.handle) {
+
+    // Validation
+    if (!req.body.handle || req.body.handle.trim() === '') {
         throw new ApiError(400, 'Handle required.');
     }
     userProfile.handle = req.body.handle;
-    if (req.body.company) userProfile.company = req.body.company;
-    if (req.body.website) userProfile.website = req.body.website;
-    if (req.body.location) userProfile.location = req.body.location;
+
+    if (req.body.company && req.body.company.trim() !== '') {
+        userProfile.company = req.body.company;
+    }
+
+    if (req.body.website && req.body.website.trim() !== '') {
+        userProfile.website = req.body.website;
+    }
+
+    if (req.body.location && req.body.location.trim() !== '') {
+        userProfile.location = req.body.location;
+    }
+
     if (!req.body.status || req.body.status.trim() === '') {
         throw new ApiError(400, 'Status required.');
     }
     userProfile.status = req.body.status;
-    if (typeof req.body.skills !== 'undefined')
-        userProfile.skills = req.body.skills.split(',');
+
+    if (typeof req.body.skills !== 'undefined') {
+        userProfile.skills = req.body.skills
+            .split(',')
+            .map((skill) => skill.trim());
+    }
+
     if (req.body.bio) userProfile.bio = req.body.bio;
     if (req.body.githubUsername)
         userProfile.githubUsername = req.body.githubUsername;
+
+    // Social fields
     userProfile.social = {};
-    if (req.body.youtube) userProfile.social.youtube = req.body.youtube;
+    if (req.body.github) userProfile.social.github = req.body.github;
     if (req.body.instagram) userProfile.social.instagram = req.body.instagram;
     if (req.body.linkedin) userProfile.social.linkedin = req.body.linkedin;
-    if (req.body.github) userProfile.social.github = req.body.github;
+    if (req.body.twitter) userProfile.social.twitter = req.body.twitter;
+    if (req.body.website) userProfile.social.website = req.body.website;
+
     const profileChecker = await Profile.findOne({ user: userProfile.user });
+
     if (profileChecker) {
+        // Update the profile with all fields including social fields
+        console.log(userProfile);
         const profile = await Profile.findOneAndUpdate(
             { user: userProfile.user },
-            { $set: { userProfile } },
+            { $set: { ...userProfile } }, // Spread all fields, including social
             { new: true }
         ).populate('user', ['name', 'avatar']);
-        res.status(200).json(
-            new ApiResponse(200, 'User profile updated.', profile)
-        );
-    }
-    if (!profileChecker) {
+
+        return res
+            .status(200)
+            .json(new ApiResponse(200, 'User profile updated.', profile));
+    } else {
+        // Create the profile with all fields including social fields
+        console.log(userProfile);
+
         await Profile.create(userProfile);
+
         const profile = await Profile.findOne({
             user: userProfile.user,
         }).populate('user', ['name', 'avatar']);
-        res.status(200).json(
-            new ApiResponse(200, 'User profile created.', profile)
-        );
+
+        return res
+            .status(200)
+            .json(new ApiResponse(200, 'User profile created.', profile));
     }
 });
 
@@ -120,56 +149,44 @@ export const getAllProfiles = asyncHandler(async (req, res) => {
 // Adding experience
 export const addExperience = asyncHandler(async (req, res) => {
     const { _id } = req.user._id;
-    const { title, company, location, from, to, current, description } =
-        req.body;
+    const { title, company, from, to } = req.body;
     if (!title) throw new ApiError(400, 'Title required.');
     if (!company) throw new ApiError(400, 'company required.');
-    if (!location) throw new ApiError(400, 'location required.');
     if (!from) throw new ApiError(400, 'from required.');
     if (!to) throw new ApiError(400, 'to required.');
-    if (!description) throw new ApiError(400, 'description required.');
     const experience = {
         title,
         company,
-        location,
         from,
         to,
-        current,
-        description,
     };
     const userProfile = await Profile.findOne({ user: _id });
     userProfile.experience.unshift(experience);
     await userProfile.save({ validateBeforeSave: false });
-    const updateProfile = await Profile.findOne({ user: _id }).populate(
+    const updatedProfile = await Profile.findOne({ user: _id }).populate(
         'user',
         ['user', 'avatar']
     );
     res.status(200).json(
-        new ApiResponse(200, 'experience added.', updateProfile)
+        new ApiResponse(200, 'experience added.', updatedProfile)
     );
 });
 
 // Adding education
 export const addEducation = asyncHandler(async (req, res) => {
     const { _id } = req.user._id;
-    const { institute, degree, fieldOfStudy, from, to, current, description } =
-        req.body;
+    const { institute, degree, from, to } = req.body;
     if (!institute) throw new ApiError(400, 'institute required.');
     if (!degree) throw new ApiError(400, 'degree required.');
-    if (!fieldOfStudy) throw new ApiError(400, 'fieldOfStudy required.');
     if (!from) throw new ApiError(400, 'from required.');
     if (!to) throw new ApiError(400, 'to required.');
-    if (!description) throw new ApiError(400, 'description required.');
-    const userProfile = await Profile.findOne({ user: _id });
     const education = {
         institute,
         degree,
-        fieldOfStudy,
         from,
         to,
-        current,
-        description,
     };
+    const userProfile = await Profile.findOne({ user: _id });
     userProfile.education.unshift(education);
     await userProfile.save({ validateBeforeSave: false });
     const updateProfile = await Profile.findOne({ user: _id }).populate(

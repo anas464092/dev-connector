@@ -71,9 +71,6 @@ export const registerUser = asyncHanlder(async (req, res) => {
                 })
             );
     }
-    // res.status(201).json(
-    //     new ApiResponse(201, 'User created successfuly', userCreated)
-    // );
 });
 
 export const loginUser = asyncHanlder(async (req, res) => {

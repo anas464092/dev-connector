@@ -7,19 +7,24 @@ import {
     MDBCardText,
     MDBCardBody,
     MDBCardImage,
-    MDBIcon,
     MDBListGroup,
     MDBListGroupItem,
 } from 'mdb-react-ui-kit';
-import { Link } from 'react-router-dom';
 import { Button, Col, FloatingLabel, Form, Modal, Row } from 'react-bootstrap';
 import { FaGithub, FaInstagram, FaLinkedin, FaTwitter } from 'react-icons/fa';
+import { MdDelete } from 'react-icons/md';
 import { DiCode } from 'react-icons/di';
+import { useGetCurrentMutation } from '../slices/profileApiSlice';
+import { useSelector } from 'react-redux';
 
 export default function Dashboard() {
     const [addFieldName, setaddFieldName] = useState('');
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
+    const [currentProfile] = useGetCurrentMutation();
+    const [currentData, setCurrentData] = useState();
+    const { userInfo } = useSelector((state) => state.auth);
+
     const addField = () => {
         setShow(false);
     };
@@ -28,6 +33,51 @@ export default function Dashboard() {
         setaddFieldName(field);
         setShow(true);
     };
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const res = await currentProfile().unwrap();
+                setCurrentData(res.data);
+            } catch (err) {
+                setCurrentData(null);
+            }
+        };
+        fetchProfile();
+    }, [currentProfile]);
+
+    // =================== FORM DATA ==================================
+    const [status, setStatus] = useState(currentData?.status || '');
+    const [username, setUsername] = useState(currentData?.handle || '');
+    const [bio, setBio] = useState(currentData?.bio || '');
+    const [company, setCompany] = useState(currentData?.company || '');
+    const [skills, setSkills] = useState(currentData?.company || '');
+    const [location, setLocation] = useState(currentData?.location || '');
+    const [github, setGithub] = useState(currentData?.social?.github || '');
+    const [instagram, setInstagram] = useState(
+        currentData?.social?.instagram || ''
+    );
+    const [linkedin, setLinkedin] = useState(
+        currentData?.social?.linkedin || ''
+    );
+    const [twitter, setTwitter] = useState(currentData?.social?.twitter || '');
+    const [website, setWebsite] = useState(currentData?.social?.website || '');
+    useEffect(() => {
+        if (currentData) {
+            setStatus(currentData.status);
+            setUsername(currentData.handle);
+            setBio(currentData.bio);
+            setCompany(currentData.company);
+            setSkills(currentData.skills.join());
+            setLocation(currentData.location);
+            setGithub(currentData.social.github);
+            setInstagram(currentData.social.instagram);
+            setLinkedin(currentData.social.linkedin);
+            setTwitter(currentData.social.twitter);
+            setWebsite(currentData.social.website);
+        }
+    }, [currentData]);
+    // ===============================================================
 
     return (
         <>
@@ -43,19 +93,21 @@ export default function Dashboard() {
                     <Modal.Body style={{ color: 'black' }}>
                         <FloatingLabel
                             controlId='floatingTextarea2'
-                            label='Institute'
+                            label='Organization'
                         >
                             <Form.Control
                                 type='text'
                                 placeholder='Organization or institute'
                             />
                         </FloatingLabel>
+                        <hr />
                         <FloatingLabel
                             controlId='floatingTextarea2'
-                            label='Status'
+                            label='Status / Degree'
                         >
                             <Form.Control type='text' placeholder='Status' />
                         </FloatingLabel>
+                        <hr />
                         <Row>
                             <Col md={6}>
                                 <FloatingLabel
@@ -98,15 +150,18 @@ export default function Dashboard() {
                             <MDBCard className='mb-4'>
                                 <MDBCardBody className='text-center'>
                                     <MDBCardImage
-                                        src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoqWIPKg9kRQhn9r3qgpcRSACAXvg-dbTOWQiDN6b5ahLRZ-AU_ioL_uXv5Un0kNGPNhE&usqp=CAU'
+                                        src={userInfo?.avatar || ''}
                                         alt='avatar'
                                         className='rounded-circle'
-                                        style={{ width: '150px' }}
+                                        style={{
+                                            width: '140px',
+                                            height: '140px',
+                                        }}
                                         fluid
                                     />
                                     {/* ======================== NAME ==================== */}
                                     <MDBCardText style={{ marginTop: '10px' }}>
-                                        <strong>Johnatan Smith</strong>
+                                        <strong>{userInfo?.name}</strong>
                                     </MDBCardText>
                                     {/* =========================== STATUS =========================== */}
                                     <Form.Control
@@ -115,7 +170,10 @@ export default function Dashboard() {
                                             marginTop: '3px',
                                         }}
                                         type='text'
-                                        value='status'
+                                        value={status || ''}
+                                        onChange={(e) =>
+                                            setStatus(e.target.value)
+                                        }
                                         placeholder='Your Status'
                                     />
                                 </MDBCardBody>
@@ -123,7 +181,10 @@ export default function Dashboard() {
 
                             <MDBCard className='mb-4 mb-lg-0'>
                                 <MDBCardBody className='p-0'>
-                                    <MDBListGroup flush className='rounded-3'>
+                                    <MDBListGroup
+                                        flush='true'
+                                        className='rounded-3'
+                                    >
                                         <MDBListGroupItem className='d-flex justify-content-between align-items-center p-3'>
                                             {/* ============= GITHUB =================================== */}
                                             <FaGithub
@@ -132,8 +193,13 @@ export default function Dashboard() {
                                             <MDBCardText>
                                                 <Form.Control
                                                     type='text'
-                                                    value='https://github.com'
-                                                    placeholder='Your github'
+                                                    value={github || ''}
+                                                    onChange={(e) =>
+                                                        setGithub(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder='github.com'
                                                 />
                                             </MDBCardText>
                                         </MDBListGroupItem>
@@ -145,8 +211,13 @@ export default function Dashboard() {
                                             <MDBCardText>
                                                 <Form.Control
                                                     type='text'
-                                                    value='https://insta.com'
-                                                    placeholder='Your instagram'
+                                                    value={instagram || ''}
+                                                    onChange={(e) =>
+                                                        setInstagram(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder='instagram.com'
                                                 />
                                             </MDBCardText>
                                         </MDBListGroupItem>
@@ -158,8 +229,13 @@ export default function Dashboard() {
                                             <MDBCardText>
                                                 <Form.Control
                                                     type='text'
-                                                    value='https://linkedIn.com'
-                                                    placeholder='Your linkedIn'
+                                                    value={linkedin || ''}
+                                                    onChange={(e) =>
+                                                        setLinkedin(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder='linkedIn.com'
                                                 />
                                             </MDBCardText>
                                         </MDBListGroupItem>
@@ -171,8 +247,13 @@ export default function Dashboard() {
                                             <MDBCardText>
                                                 <Form.Control
                                                     type='text'
-                                                    value='https://twitter.com'
-                                                    placeholder='Your twitter'
+                                                    value={twitter || ''}
+                                                    onChange={(e) =>
+                                                        setTwitter(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder='twitter.com'
                                                 />
                                             </MDBCardText>
                                         </MDBListGroupItem>
@@ -184,8 +265,13 @@ export default function Dashboard() {
                                             <MDBCardText>
                                                 <Form.Control
                                                     type='text'
-                                                    value='https://webiste.com'
-                                                    placeholder='Your website'
+                                                    value={website || ''}
+                                                    onChange={(e) =>
+                                                        setWebsite(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder='website.com'
                                                 />
                                             </MDBCardText>
                                         </MDBListGroupItem>
@@ -196,8 +282,8 @@ export default function Dashboard() {
                         <MDBCol lg='8'>
                             <MDBCard className='mb-4'>
                                 <MDBCardBody>
+                                    {/* ================ USERNAME ============================ */}
                                     <MDBRow>
-                                        {/* ================ USERNAME ============================ */}
                                         <MDBCol sm='3'>
                                             <MDBCardText>Uername</MDBCardText>
                                         </MDBCol>
@@ -205,7 +291,12 @@ export default function Dashboard() {
                                             <MDBCardText className='text-muted'>
                                                 <Form.Control
                                                     type='text'
-                                                    value='arehman'
+                                                    value={username || ''}
+                                                    onChange={(e) =>
+                                                        setUsername(
+                                                            e.target.value
+                                                        )
+                                                    }
                                                     placeholder='Username'
                                                 />
                                             </MDBCardText>
@@ -221,7 +312,10 @@ export default function Dashboard() {
                                             <MDBCardText className='text-muted'>
                                                 <Form.Control
                                                     as='textarea'
-                                                    value='I am a student of BESE at NUST'
+                                                    value={bio || ''}
+                                                    onChange={(e) =>
+                                                        setBio(e.target.value)
+                                                    }
                                                     placeholder='Your bio'
                                                     style={{
                                                         height: '80px',
@@ -241,7 +335,12 @@ export default function Dashboard() {
                                             <MDBCardText className='text-muted'>
                                                 <Form.Control
                                                     type='text'
-                                                    value='Google'
+                                                    value={company || ''}
+                                                    onChange={(e) =>
+                                                        setCompany(
+                                                            e.target.value
+                                                        )
+                                                    }
                                                     placeholder='Your Organization'
                                                 />
                                             </MDBCardText>
@@ -257,8 +356,13 @@ export default function Dashboard() {
                                             <MDBCardText className='text-muted'>
                                                 <Form.Control
                                                     type='text'
-                                                    value='Skill1, Skill2, ...'
-                                                    placeholder='Your skills'
+                                                    value={skills || ''}
+                                                    onChange={(e) =>
+                                                        setSkills(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder='Skill1, Skill2, ...'
                                                 />
                                             </MDBCardText>
                                         </MDBCol>
@@ -267,13 +371,18 @@ export default function Dashboard() {
                                     {/* =============================ADDRESS ============================== */}
                                     <MDBRow>
                                         <MDBCol sm='3'>
-                                            <MDBCardText>Address</MDBCardText>
+                                            <MDBCardText>Location</MDBCardText>
                                         </MDBCol>
                                         <MDBCol sm='9'>
                                             <MDBCardText className='text-muted'>
                                                 <Form.Control
                                                     type='text'
-                                                    value='Bay Area, San Francisco, CA'
+                                                    value={location || ''}
+                                                    onChange={(e) =>
+                                                        setLocation(
+                                                            e.target.value
+                                                        )
+                                                    }
                                                     placeholder='Your Address'
                                                 />
                                             </MDBCardText>
@@ -302,24 +411,49 @@ export default function Dashboard() {
                                                 </MDBCol>
                                             </MDBRow>
                                             <hr />
-                                            <MDBRow>
-                                                <MDBCol sm='6'>
-                                                    <MDBCardText>
-                                                        NUST
-                                                    </MDBCardText>
-                                                    <MDBCardText className='text-muted'>
-                                                        09/07/2023
-                                                    </MDBCardText>
-                                                </MDBCol>
-                                                <MDBCol sm='6'>
-                                                    <MDBCardText className='text-muted'>
-                                                        BE Software
-                                                    </MDBCardText>
-                                                    <MDBCardText className='text-muted'>
-                                                        09/07/2023
-                                                    </MDBCardText>
-                                                </MDBCol>
-                                            </MDBRow>
+                                            {currentData?.education?.map(
+                                                (edu) => (
+                                                    <>
+                                                        <MDBRow key={edu._id}>
+                                                            <MDBCol sm='6'>
+                                                                <MDBCardText>
+                                                                    {
+                                                                        edu.institute
+                                                                    }
+                                                                </MDBCardText>
+                                                                <MDBCardText className='text-muted'>
+                                                                    {edu.degree}
+                                                                </MDBCardText>
+                                                            </MDBCol>
+                                                            <MDBCol sm='6'>
+                                                                <MDBCardText className='text-muted'>
+                                                                    {new Date(
+                                                                        edu.from
+                                                                    ).toLocaleDateString()}
+                                                                </MDBCardText>
+                                                                <MDBCardText className='text-muted'>
+                                                                    {new Date(
+                                                                        edu.to
+                                                                    ).toLocaleDateString()}
+                                                                </MDBCardText>
+                                                            </MDBCol>
+                                                            <Button
+                                                                variant='secondary'
+                                                                style={{
+                                                                    marginTop:
+                                                                        '10px',
+                                                                    width: '40px',
+                                                                    marginLeft:
+                                                                        '10px',
+                                                                }}
+                                                            >
+                                                                <MdDelete />
+                                                            </Button>
+                                                        </MDBRow>
+                                                        <hr />
+                                                    </>
+                                                )
+                                            )}
                                         </MDBCardBody>
                                     </MDBCard>
                                 </MDBCol>
@@ -343,24 +477,49 @@ export default function Dashboard() {
                                                 </MDBCol>
                                             </MDBRow>
                                             <hr />
-                                            <MDBRow>
-                                                <MDBCol sm='6'>
-                                                    <MDBCardText>
-                                                        NUST
-                                                    </MDBCardText>
-                                                    <MDBCardText className='text-muted'>
-                                                        09/07/2023
-                                                    </MDBCardText>
-                                                </MDBCol>
-                                                <MDBCol sm='6'>
-                                                    <MDBCardText className='text-muted'>
-                                                        BE Software
-                                                    </MDBCardText>
-                                                    <MDBCardText className='text-muted'>
-                                                        09/07/2023
-                                                    </MDBCardText>
-                                                </MDBCol>
-                                            </MDBRow>
+                                            {currentData?.experience?.map(
+                                                (exp) => (
+                                                    <>
+                                                        <MDBRow key={exp._id}>
+                                                            <MDBCol sm='6'>
+                                                                <MDBCardText>
+                                                                    {
+                                                                        exp.company
+                                                                    }
+                                                                </MDBCardText>
+                                                                <MDBCardText className='text-muted'>
+                                                                    {exp.title}
+                                                                </MDBCardText>
+                                                            </MDBCol>
+                                                            <MDBCol sm='6'>
+                                                                <MDBCardText className='text-muted'>
+                                                                    {new Date(
+                                                                        exp.from
+                                                                    ).toLocaleDateString()}
+                                                                </MDBCardText>
+                                                                <MDBCardText className='text-muted'>
+                                                                    {new Date(
+                                                                        exp.to
+                                                                    ).toLocaleDateString()}
+                                                                </MDBCardText>
+                                                            </MDBCol>
+                                                            <Button
+                                                                variant='secondary'
+                                                                style={{
+                                                                    marginTop:
+                                                                        '10px',
+                                                                    width: '40px',
+                                                                    marginLeft:
+                                                                        '10px',
+                                                                }}
+                                                            >
+                                                                <MdDelete />
+                                                            </Button>
+                                                        </MDBRow>
+                                                        <hr />
+                                                    </>
+                                                )
+                                            )}
                                         </MDBCardBody>
                                     </MDBCard>
                                 </MDBCol>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     MDBCol,
     MDBContainer,
@@ -12,194 +12,354 @@ import {
     MDBListGroupItem,
 } from 'mdb-react-ui-kit';
 import { Link, useLocation } from 'react-router-dom';
+import { useGetSingleProfileMutation } from '../slices/profileApiSlice';
+import { toast } from 'react-toastify';
+import { Spinner } from 'react-bootstrap';
+import { FaGithub, FaInstagram, FaLinkedin, FaTwitter } from 'react-icons/fa';
+import { DiCode } from 'react-icons/di';
 
 export default function ProfilePage() {
     const location = useLocation();
     const { _id } = location.state || {};
+    const [userProfile, { isLoading }] = useGetSingleProfileMutation();
+    const [data, setData] = useState();
+
     useEffect(() => {
-        console.log(_id);
+        const fetchData = async () => {
+            try {
+                const res = await userProfile(_id).unwrap();
+                setData(res.data);
+            } catch (err) {
+                toast.error(err?.data?.message || 'Unable to fetch data');
+                console.log(err);
+            }
+        };
+        fetchData();
     }, []);
     return (
         <>
-            <Link className='btn btn-light my-3' to='/developers'>
-                Go Back
-            </Link>
-            <section style={{ backgroundColor: '#212121' }}>
-                <MDBContainer className='py-5 '>
-                    <MDBRow>
-                        <MDBCol lg='4'>
-                            <MDBCard className='mb-4'>
-                                <MDBCardBody className='text-center'>
-                                    <MDBCardImage
-                                        src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoqWIPKg9kRQhn9r3qgpcRSACAXvg-dbTOWQiDN6b5ahLRZ-AU_ioL_uXv5Un0kNGPNhE&usqp=CAU'
-                                        alt='avatar'
-                                        className='rounded-circle'
-                                        style={{ width: '150px' }}
-                                        fluid
-                                    />
-                                    <p className='text-muted mb-1'>
-                                        Full Stack Developer
-                                    </p>
-                                    <p className='text-muted mb-4'>
-                                        Bay Area, San Francisco, CA
-                                    </p>
-                                </MDBCardBody>
-                            </MDBCard>
-
-                            <MDBCard className='mb-4 mb-lg-0'>
-                                <MDBCardBody className='p-0'>
-                                    <MDBListGroup flush className='rounded-3'>
-                                        <MDBListGroupItem className='d-flex justify-content-between align-items-center p-3'>
-                                            <MDBIcon
-                                                fas
-                                                icon='globe fa-lg text-warning'
-                                            />
-                                            <MDBCardText>
-                                                https://mdbootstrap.com
-                                            </MDBCardText>
-                                        </MDBListGroupItem>
-                                        <MDBListGroupItem className='d-flex justify-content-between align-items-center p-3'>
-                                            <MDBIcon
-                                                fab
-                                                icon='github fa-lg'
-                                                style={{ color: '#212121' }}
-                                            />
-                                            <MDBCardText>
-                                                mdbootstrap
-                                            </MDBCardText>
-                                        </MDBListGroupItem>
-                                        <MDBListGroupItem className='d-flex justify-content-between align-items-center p-3'>
-                                            <MDBIcon
-                                                fab
-                                                icon='twitter fa-lg'
-                                                style={{ color: '#55acee' }}
-                                            />
-                                            <MDBCardText>
-                                                @mdbootstrap
-                                            </MDBCardText>
-                                        </MDBListGroupItem>
-                                        <MDBListGroupItem className='d-flex justify-content-between align-items-center p-3'>
-                                            <MDBIcon
-                                                fab
-                                                icon='instagram fa-lg'
-                                                style={{ color: '#ac2bac' }}
-                                            />
-                                            <MDBCardText>
-                                                mdbootstrap
-                                            </MDBCardText>
-                                        </MDBListGroupItem>
-                                        <MDBListGroupItem className='d-flex justify-content-between align-items-center p-3'>
-                                            <MDBIcon
-                                                fab
-                                                icon='facebook fa-lg'
-                                                style={{ color: '#3b5998' }}
-                                            />
-                                            <MDBCardText>
-                                                mdbootstrap
-                                            </MDBCardText>
-                                        </MDBListGroupItem>
-                                    </MDBListGroup>
-                                </MDBCardBody>
-                            </MDBCard>
-                        </MDBCol>
-                        <MDBCol lg='8'>
-                            <MDBCard className='mb-4'>
-                                <MDBCardBody>
-                                    <MDBRow>
-                                        <MDBCol sm='3'>
-                                            <MDBCardText>Full Name</MDBCardText>
-                                        </MDBCol>
-                                        <MDBCol sm='9'>
-                                            <MDBCardText className='text-muted'>
-                                                Johnatan Smith
-                                            </MDBCardText>
-                                        </MDBCol>
-                                    </MDBRow>
-                                    <hr />
-                                    <MDBRow>
-                                        <MDBCol sm='3'>
-                                            <MDBCardText>Email</MDBCardText>
-                                        </MDBCol>
-                                        <MDBCol sm='9'>
-                                            <MDBCardText className='text-muted'>
-                                                example@example.com
-                                            </MDBCardText>
-                                        </MDBCol>
-                                    </MDBRow>
-                                    <hr />
-                                    <MDBRow>
-                                        <MDBCol sm='3'>
-                                            <MDBCardText>Phone</MDBCardText>
-                                        </MDBCol>
-                                        <MDBCol sm='9'>
-                                            <MDBCardText className='text-muted'>
-                                                (097) 234-5678
-                                            </MDBCardText>
-                                        </MDBCol>
-                                    </MDBRow>
-                                    <hr />
-                                    <MDBRow>
-                                        <MDBCol sm='3'>
-                                            <MDBCardText>Address</MDBCardText>
-                                        </MDBCol>
-                                        <MDBCol sm='9'>
-                                            <MDBCardText className='text-muted'>
-                                                Bay Area, San Francisco, CA
-                                            </MDBCardText>
-                                        </MDBCol>
-                                    </MDBRow>
-                                </MDBCardBody>
-                            </MDBCard>
-
-                            {/* Education  */}
+            {isLoading ? (
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '50px 0px',
+                    }}
+                >
+                    <Spinner
+                        animation='border'
+                        role='status'
+                        style={{
+                            width: '100px',
+                            height: '100px',
+                        }}
+                    />
+                </div>
+            ) : (
+                <>
+                    <Link className='btn btn-light my-3' to='/developers'>
+                        Go Back
+                    </Link>
+                    <section style={{ backgroundColor: '#212121' }}>
+                        <MDBContainer className='py-5 '>
                             <MDBRow>
-                                <MDBCol md='6'>
-                                    <MDBCard className='mb-4 mb-md-0'>
-                                        <MDBCardBody>
-                                            <strong>Education</strong>
-                                            <hr />
-                                            <MDBRow>
-                                                <MDBCol sm='6'>
+                                <MDBCol lg='4'>
+                                    <MDBCard className='mb-4'>
+                                        <MDBCardBody className='text-center'>
+                                            <MDBCardImage
+                                                src={data?.user?.avatar || ''}
+                                                alt='avatar'
+                                                className='rounded-circle'
+                                                style={{
+                                                    width: '140px',
+                                                    height: '140px',
+                                                }}
+                                                fluid
+                                            />
+                                            {/* ======================== NAME ==================== */}
+                                            <MDBCardText
+                                                style={{ marginTop: '10px' }}
+                                            >
+                                                <strong>
+                                                    {data?.user?.name}
+                                                </strong>
+                                            </MDBCardText>
+                                            {/* =========================== STATUS =========================== */}
+                                            <MDBCardText
+                                                style={{ marginTop: '10px' }}
+                                            >
+                                                {data?.status}
+                                            </MDBCardText>
+                                        </MDBCardBody>
+                                    </MDBCard>
+
+                                    <MDBCard className='mb-4 mb-lg-0'>
+                                        <MDBCardBody className='p-0'>
+                                            <MDBListGroup
+                                                flush
+                                                className='rounded-3'
+                                            >
+                                                <MDBListGroupItem className='d-flex justify-content-between align-items-center p-3'>
+                                                    {/* ============= GITHUB =================================== */}
+                                                    <FaGithub
+                                                        style={{
+                                                            fontSize: '35px',
+                                                        }}
+                                                    />
                                                     <MDBCardText>
-                                                        NUST
+                                                        {data?.social?.github ||
+                                                            'Github'}
                                                     </MDBCardText>
-                                                </MDBCol>
-                                                <MDBCol sm='6'>
-                                                    <MDBCardText className='text-muted'>
-                                                        BE Software
+                                                </MDBListGroupItem>
+                                                <MDBListGroupItem className='d-flex justify-content-between align-items-center p-3'>
+                                                    {/* ======================== INSTAGRAM ============================= */}
+                                                    <FaInstagram
+                                                        style={{
+                                                            fontSize: '35px',
+                                                        }}
+                                                    />
+                                                    <MDBCardText>
+                                                        <MDBCardText>
+                                                            {data?.social
+                                                                ?.instagram ||
+                                                                'Instagram'}
+                                                        </MDBCardText>
                                                     </MDBCardText>
-                                                </MDBCol>
-                                            </MDBRow>
+                                                </MDBListGroupItem>
+                                                <MDBListGroupItem className='d-flex justify-content-between align-items-center p-3'>
+                                                    {/* ========================= LINKEDIN =================================== */}
+                                                    <FaLinkedin
+                                                        style={{
+                                                            fontSize: '35px',
+                                                        }}
+                                                    />
+                                                    <MDBCardText>
+                                                        <MDBCardText>
+                                                            {data?.social
+                                                                ?.linkedin ||
+                                                                'LinkedIn'}
+                                                        </MDBCardText>
+                                                    </MDBCardText>
+                                                </MDBListGroupItem>
+                                                <MDBListGroupItem className='d-flex justify-content-between align-items-center p-3'>
+                                                    {/* ========================= TWITTER ================================ */}
+                                                    <FaTwitter
+                                                        style={{
+                                                            fontSize: '35px',
+                                                        }}
+                                                    />
+                                                    <MDBCardText>
+                                                        <MDBCardText>
+                                                            {data?.social
+                                                                ?.twitter ||
+                                                                'Twitter'}
+                                                        </MDBCardText>
+                                                    </MDBCardText>
+                                                </MDBListGroupItem>
+                                                <MDBListGroupItem className='d-flex justify-content-between align-items-center p-3'>
+                                                    {/* ============================ WEBSITE =============================== */}
+                                                    <DiCode
+                                                        style={{
+                                                            fontSize: '35px',
+                                                        }}
+                                                    />
+                                                    <MDBCardText>
+                                                        <MDBCardText>
+                                                            {data?.social
+                                                                ?.webiste ||
+                                                                'Website'}
+                                                        </MDBCardText>
+                                                    </MDBCardText>
+                                                </MDBListGroupItem>
+                                            </MDBListGroup>
                                         </MDBCardBody>
                                     </MDBCard>
                                 </MDBCol>
-
-                                {/* Experince  */}
-                                <MDBCol md='6'>
-                                    <MDBCard className='mb-4 mb-md-0'>
+                                <MDBCol lg='8'>
+                                    <MDBCard className='mb-4'>
                                         <MDBCardBody>
-                                            <strong>Experience</strong>
-                                            <hr />
+                                            {/* ================ USERNAME ============================ */}
                                             <MDBRow>
-                                                <MDBCol sm='6'>
+                                                <MDBCol sm='3'>
                                                     <MDBCardText>
-                                                        Cogent Lab
+                                                        Uername
                                                     </MDBCardText>
                                                 </MDBCol>
-                                                <MDBCol sm='6'>
+                                                <MDBCol sm='9'>
                                                     <MDBCardText className='text-muted'>
-                                                        Front-End-Developer
+                                                        {data?.handle}
+                                                    </MDBCardText>
+                                                </MDBCol>
+                                            </MDBRow>
+                                            <hr />
+                                            {/* =========================== BIO =========================== */}
+                                            <MDBRow>
+                                                <MDBCol sm='3'>
+                                                    <MDBCardText>
+                                                        Bio
+                                                    </MDBCardText>
+                                                </MDBCol>
+                                                <MDBCol sm='9'>
+                                                    <MDBCardText className='text-muted'>
+                                                        {data?.bio}
+                                                    </MDBCardText>
+                                                </MDBCol>
+                                            </MDBRow>
+                                            <hr />
+                                            {/* ======================= COMPANY ====================== */}
+                                            <MDBRow>
+                                                <MDBCol sm='3'>
+                                                    <MDBCardText>
+                                                        Company
+                                                    </MDBCardText>
+                                                </MDBCol>
+                                                <MDBCol sm='9'>
+                                                    <MDBCardText className='text-muted'>
+                                                        {data?.company}
+                                                    </MDBCardText>
+                                                </MDBCol>
+                                            </MDBRow>
+                                            <hr />
+                                            {/* ============================= SKILLS ========================== */}
+                                            <MDBRow>
+                                                <MDBCol sm='3'>
+                                                    <MDBCardText>
+                                                        Skills
+                                                    </MDBCardText>
+                                                </MDBCol>
+                                                <MDBCol sm='9'>
+                                                    <MDBCardText className='text-muted'>
+                                                        {data?.skills.join()}
+                                                    </MDBCardText>
+                                                </MDBCol>
+                                            </MDBRow>
+                                            <hr />
+                                            {/* =============================ADDRESS ============================== */}
+                                            <MDBRow>
+                                                <MDBCol sm='3'>
+                                                    <MDBCardText>
+                                                        Location
+                                                    </MDBCardText>
+                                                </MDBCol>
+                                                <MDBCol sm='9'>
+                                                    <MDBCardText className='text-muted'>
+                                                        {data?.location}
                                                     </MDBCardText>
                                                 </MDBCol>
                                             </MDBRow>
                                         </MDBCardBody>
                                     </MDBCard>
+
+                                    {/* Education  */}
+                                    <MDBRow>
+                                        <MDBCol md='6'>
+                                            <MDBCard className='mb-4 mb-md-0'>
+                                                <MDBCardBody>
+                                                    <MDBRow>
+                                                        <MDBCol>
+                                                            <strong>
+                                                                Education
+                                                            </strong>
+                                                        </MDBCol>
+                                                    </MDBRow>
+                                                    <hr />
+                                                    {data?.education?.map(
+                                                        (edu) => (
+                                                            <>
+                                                                <MDBRow
+                                                                    key={Date.now()}
+                                                                >
+                                                                    <MDBCol sm='6'>
+                                                                        <MDBCardText>
+                                                                            {
+                                                                                edu.institute
+                                                                            }
+                                                                        </MDBCardText>
+                                                                        <MDBCardText>
+                                                                            {
+                                                                                edu.degree
+                                                                            }
+                                                                        </MDBCardText>
+                                                                    </MDBCol>
+                                                                    <MDBCol sm='6'>
+                                                                        <MDBCardText className='text-muted'>
+                                                                            {new Date(
+                                                                                edu.from
+                                                                            ).toLocaleDateString()}
+                                                                        </MDBCardText>
+                                                                        <MDBCardText className='text-muted'>
+                                                                            {new Date(
+                                                                                edu.to
+                                                                            ).toLocaleDateString()}
+                                                                        </MDBCardText>
+                                                                    </MDBCol>
+                                                                </MDBRow>
+                                                                <hr />
+                                                            </>
+                                                        )
+                                                    )}
+                                                </MDBCardBody>
+                                            </MDBCard>
+                                        </MDBCol>
+
+                                        {/* Experince  */}
+                                        <MDBCol md='6'>
+                                            <MDBCard className='mb-4 mb-md-0'>
+                                                <MDBCardBody>
+                                                    <MDBRow>
+                                                        <MDBCol>
+                                                            <strong>
+                                                                Experience
+                                                            </strong>
+                                                        </MDBCol>
+                                                    </MDBRow>
+                                                    <hr />
+                                                    {data?.experience?.map(
+                                                        (exp) => (
+                                                            <>
+                                                                <MDBRow
+                                                                    key={Date.now()}
+                                                                >
+                                                                    <MDBCol sm='6'>
+                                                                        <MDBCardText>
+                                                                            {
+                                                                                exp.company
+                                                                            }
+                                                                        </MDBCardText>
+                                                                        <MDBCardText>
+                                                                            {
+                                                                                exp.title
+                                                                            }
+                                                                        </MDBCardText>
+                                                                    </MDBCol>
+                                                                    <MDBCol sm='6'>
+                                                                        <MDBCardText className='text-muted'>
+                                                                            {new Date(
+                                                                                exp.from
+                                                                            ).toLocaleDateString()}
+                                                                        </MDBCardText>
+                                                                        <MDBCardText className='text-muted'>
+                                                                            {new Date(
+                                                                                exp.to
+                                                                            ).toLocaleDateString()}
+                                                                        </MDBCardText>
+                                                                    </MDBCol>
+                                                                </MDBRow>
+                                                                <hr />
+                                                            </>
+                                                        )
+                                                    )}
+                                                </MDBCardBody>
+                                            </MDBCard>
+                                        </MDBCol>
+                                    </MDBRow>
                                 </MDBCol>
                             </MDBRow>
-                        </MDBCol>
-                    </MDBRow>
-                </MDBContainer>
-            </section>
+                        </MDBContainer>
+                    </section>
+                </>
+            )}
         </>
     );
 }

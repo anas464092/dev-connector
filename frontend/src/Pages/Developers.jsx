@@ -91,7 +91,9 @@ function Developers() {
                                             marginTop: '20px',
                                             cursor: 'pointer',
                                         }}
-                                        onClick={() => showProfile(user._id)}
+                                        onClick={() =>
+                                            showProfile(user.user._id)
+                                        }
                                     >
                                         <Col md={3}>
                                             <Image

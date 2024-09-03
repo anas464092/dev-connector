@@ -14,15 +14,15 @@ function Login() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [login] = useLoginMutation();
+    const [loading, setLoading] = useState(false);
     const { userInfo } = useSelector((state) => state.auth);
 
     useEffect(() => {
-        // if (userInfo) {
-        //     navigate('/dashboard');
-        // }
+        if (userInfo) {
+            navigate('/dashboard');
+        }
     }, []);
 
-    const [loading, setLoading] = useState(false);
     const formik = useFormik({
         initialValues: {
             email: '',
@@ -43,10 +43,8 @@ function Login() {
             try {
                 const res = await login(payload).unwrap();
                 dispatch(setCredentials({ ...res }));
-                if (res.statusCode === 200) {
-                    toast.success(res?.data?.message || 'Login Successfully');
-                }
                 resetForm();
+                navigate('/dashboard');
             } catch (err) {
                 toast.error(err?.data?.message || err.message);
             }

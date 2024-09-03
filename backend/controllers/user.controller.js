@@ -53,10 +53,27 @@ export const registerUser = asyncHanlder(async (req, res) => {
     const userCreated = await User.findOne({ email }).select('-password');
     if (!userCreated) {
         throw new ApiError(500, 'USER CANT REGISTERD TRY LATER.');
+    } else {
+        const accessToken = userCreated.generateAccessToken();
+        const option = {
+            httpOnly: true,
+            secure: true,
+        };
+        res.status(200)
+            .cookie('accessToken', accessToken, option)
+            .set('Authorization', `Bearer ${accessToken}`)
+            .json(
+                new ApiResponse(200, 'User registered and login Successfully', {
+                    _id: userCreated._id,
+                    name: userCreated.name,
+                    email: userCreated.email,
+                    avatar: userCreated.avatar,
+                })
+            );
     }
-    res.status(201).json(
-        new ApiResponse(201, 'User created successfuly', userCreated)
-    );
+    // res.status(201).json(
+    //     new ApiResponse(201, 'User created successfuly', userCreated)
+    // );
 });
 
 export const loginUser = asyncHanlder(async (req, res) => {
@@ -93,7 +110,10 @@ export const loginUser = asyncHanlder(async (req, res) => {
         .set('Authorization', `Bearer ${accessToken}`)
         .json(
             new ApiResponse(200, 'User login Successfully', {
-                email,
+                _id: checkUser._id,
+                name: checkUser.name,
+                email: checkUser.email,
+                avatar: checkUser.avatar,
             })
         );
 });

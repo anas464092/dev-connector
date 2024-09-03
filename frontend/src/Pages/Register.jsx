@@ -1,16 +1,27 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, Spinner } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import { useFormik } from 'formik';
 import { validateRegister } from '../validation/registerValidator';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router';
+import { useSelector, useDispatch } from 'react-redux';
+import { setCredentials } from '../slices/authSlice';
+import { useRegisterMutation } from '../slices/userApiSlice';
 
 function Register() {
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
     const [loading, setLoading] = useState(false);
+    const { userInfo } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
+    const [register] = useRegisterMutation();
+
+    useEffect(() => {
+        if (userInfo) {
+            navigate('/profile');
+        }
+    }, []);
 
     // ==========================  FORMIK VALIDATION =================================
     const formik = useFormik({
@@ -32,39 +43,12 @@ function Register() {
             formData.append('avatar', values.avatar);
 
             try {
-                const res = await axios.post('/api/users/register', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-
-                if (res.data.statusCode === 201) {
-                    toast.success('User registered successfully.');
-                    resetForm();
-                    if (fileInputRef.current) {
-                        fileInputRef.current.value = null; // Reset the file input
-                    }
-                    setTimeout(() => {
-                        navigate('/login');
-                    }, 1000);
-                    localStorage.setItem(
-                        'registerUserId',
-                        JSON.stringify(res.data.data._id)
-                    );
-                }
+                const res = await register(formData).unwrap();
+                dispatch(setCredentials({ ...res }));
+                resetForm();
+                navigate('/dashboard');
             } catch (err) {
-                if (err.response) {
-                    const statusCode = err.response.status;
-                    if (statusCode === 409) {
-                        toast.error('Email already registered.');
-                    } else if (statusCode === 500) {
-                        toast.error('Server Error, Try Later');
-                    } else {
-                        toast.error('An unexpected error occurred.');
-                    }
-                } else {
-                    toast.error('Network Error or Backend Not Reachable.');
-                }
+                toast.error(err?.data?.message || err.message);
             }
             setLoading(false);
         },

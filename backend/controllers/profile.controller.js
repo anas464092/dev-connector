@@ -231,7 +231,7 @@ export const deleteEducation = asyncHandler(async (req, res) => {
         .map((item) => item.id.toString())
         .indexOf(id);
     if (removeIndex === -1) {
-        throw new ApiError(404, 'Experience not found.');
+        throw new ApiError(404, 'Education not found.');
     }
     userProfile.education.splice(removeIndex, 1); // Correct usage of splice
     await userProfile.save({ validateBeforeSave: false });

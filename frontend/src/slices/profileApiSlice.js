@@ -10,7 +10,24 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 method: 'GET',
             }),
         }),
+        addEducation: builder.mutation({
+            query: (data) => ({
+                url: `${PROFILE_URL}/education`,
+                method: 'POST',
+                body: data,
+            }),
+        }),
+        deleteEducation: builder.mutation({
+            query: (id) => ({
+                url: `${PROFILE_URL}/education/${id}`,
+                method: 'DELETE',
+            }),
+        }),
     }),
 });
 
-export const { useGetCurrentMutation } = userApiSlice;
+export const {
+    useGetCurrentMutation,
+    useAddEducationMutation,
+    useDeleteEducationMutation,
+} = userApiSlice;

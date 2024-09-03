@@ -10,12 +10,25 @@ import {
     MDBListGroup,
     MDBListGroupItem,
 } from 'mdb-react-ui-kit';
-import { Button, Col, FloatingLabel, Form, Modal, Row } from 'react-bootstrap';
+import {
+    Button,
+    Col,
+    FloatingLabel,
+    Form,
+    Modal,
+    Row,
+    Spinner,
+} from 'react-bootstrap';
 import { FaGithub, FaInstagram, FaLinkedin, FaTwitter } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import { DiCode } from 'react-icons/di';
-import { useGetCurrentMutation } from '../slices/profileApiSlice';
+import {
+    useGetCurrentMutation,
+    useDeleteEducationMutation,
+    useAddEducationMutation,
+} from '../slices/profileApiSlice';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 export default function Dashboard() {
     const [addFieldName, setaddFieldName] = useState('');
@@ -24,10 +37,6 @@ export default function Dashboard() {
     const [currentProfile] = useGetCurrentMutation();
     const [currentData, setCurrentData] = useState();
     const { userInfo } = useSelector((state) => state.auth);
-
-    const addField = () => {
-        setShow(false);
-    };
 
     const addBtn = (field) => {
         setaddFieldName(field);
@@ -62,6 +71,9 @@ export default function Dashboard() {
     );
     const [twitter, setTwitter] = useState(currentData?.social?.twitter || '');
     const [website, setWebsite] = useState(currentData?.social?.website || '');
+
+    const [education, setEducation] = useState(currentData?.education || []);
+
     useEffect(() => {
         if (currentData) {
             setStatus(currentData.status);
@@ -75,9 +87,58 @@ export default function Dashboard() {
             setLinkedin(currentData.social.linkedin);
             setTwitter(currentData.social.twitter);
             setWebsite(currentData.social.website);
+            setEducation(currentData.education);
         }
-    }, [currentData]);
+    }, [currentData, education]);
     // ===============================================================
+
+    // ====================== ADDING EDUCATION / EXPEREINCE =================
+    const [addEducation] = useAddEducationMutation();
+    const [addingFieldLoading, setAddingFieldLoading] = useState(false);
+    const [addingOrganization, setAddingOrganization] = useState('');
+    const [addingStatus, setAddingStatus] = useState('');
+    const [fromDate, setFromDate] = useState('');
+    const [toDate, setToDate] = useState('');
+    const addField = async () => {
+        setAddingFieldLoading(true);
+        try {
+            if (addFieldName === 'Education') {
+                const payload = {
+                    institute: addingOrganization,
+                    degree: addingStatus,
+                    from: fromDate,
+                    to: toDate,
+                };
+                await addEducation(payload).unwrap();
+            } else {
+            }
+        } catch (err) {
+            toast.error(err?.data?.message);
+        }
+        setAddingFieldLoading(false);
+        setAddingOrganization('');
+        setAddingStatus('');
+        setFromDate('');
+        setToDate('');
+        setShow(false);
+        window.location.reload(true);
+    };
+
+    // ===================== DELETE EDUCATION =========================
+    const [deleteEdu] = useDeleteEducationMutation();
+    const [deletingEducationId, setDeletingEducationId] = useState(null);
+    const deleteEducation = async (id) => {
+        setDeletingEducationId(id);
+        try {
+            await deleteEdu(id).unwrap();
+            window.location.reload(true);
+        } catch (err) {
+            toast.error(err?.data?.message || 'Unable to delete');
+            console.log(err);
+        }
+        setDeletingEducationId(null);
+    };
+    // =================================================================
 
     return (
         <>
@@ -97,6 +158,10 @@ export default function Dashboard() {
                         >
                             <Form.Control
                                 type='text'
+                                value={addingOrganization}
+                                onChange={(e) =>
+                                    setAddingOrganization(e.target.value)
+                                }
                                 placeholder='Organization or institute'
                             />
                         </FloatingLabel>
@@ -105,7 +170,14 @@ export default function Dashboard() {
                             controlId='floatingTextarea2'
                             label='Status / Degree'
                         >
-                            <Form.Control type='text' placeholder='Status' />
+                            <Form.Control
+                                value={addingStatus}
+                                onChange={(e) =>
+                                    setAddingStatus(e.target.value)
+                                }
+                                type='text'
+                                placeholder='Status'
+                            />
                         </FloatingLabel>
                         <hr />
                         <Row>
@@ -116,6 +188,10 @@ export default function Dashboard() {
                                 >
                                     <Form.Control
                                         type='date'
+                                        value={fromDate}
+                                        onChange={(e) =>
+                                            setFromDate(e.target.value)
+                                        }
                                         placeholder='Start date'
                                     />
                                 </FloatingLabel>
@@ -127,6 +203,10 @@ export default function Dashboard() {
                                 >
                                     <Form.Control
                                         type='date'
+                                        value={toDate}
+                                        onChange={(e) =>
+                                            setToDate(e.target.value)
+                                        }
                                         placeholder='End date'
                                     />
                                 </FloatingLabel>
@@ -137,8 +217,23 @@ export default function Dashboard() {
                         <Button variant='secondary' onClick={handleClose}>
                             Close
                         </Button>
-                        <Button variant='primary' onClick={addField}>
-                            Add {addFieldName}
+                        <Button
+                            variant='primary'
+                            disabled={addingFieldLoading}
+                            onClick={addField}
+                        >
+                            {addingFieldLoading ? (
+                                <Spinner
+                                    animation='border'
+                                    role='status'
+                                    style={{
+                                        width: '20px',
+                                        height: '20px',
+                                    }}
+                                />
+                            ) : (
+                                <>Add {addFieldName}</>
+                            )}
                         </Button>
                     </Modal.Footer>
                 </Modal>
@@ -411,49 +506,67 @@ export default function Dashboard() {
                                                 </MDBCol>
                                             </MDBRow>
                                             <hr />
-                                            {currentData?.education?.map(
-                                                (edu) => (
-                                                    <>
-                                                        <MDBRow key={edu._id}>
-                                                            <MDBCol sm='6'>
-                                                                <MDBCardText>
-                                                                    {
-                                                                        edu.institute
-                                                                    }
-                                                                </MDBCardText>
-                                                                <MDBCardText className='text-muted'>
-                                                                    {edu.degree}
-                                                                </MDBCardText>
-                                                            </MDBCol>
-                                                            <MDBCol sm='6'>
-                                                                <MDBCardText className='text-muted'>
-                                                                    {new Date(
-                                                                        edu.from
-                                                                    ).toLocaleDateString()}
-                                                                </MDBCardText>
-                                                                <MDBCardText className='text-muted'>
-                                                                    {new Date(
-                                                                        edu.to
-                                                                    ).toLocaleDateString()}
-                                                                </MDBCardText>
-                                                            </MDBCol>
-                                                            <Button
-                                                                variant='secondary'
-                                                                style={{
-                                                                    marginTop:
-                                                                        '10px',
-                                                                    width: '40px',
-                                                                    marginLeft:
-                                                                        '10px',
-                                                                }}
-                                                            >
+                                            {education?.map((edu) => (
+                                                <>
+                                                    <MDBRow key={Date.now()}>
+                                                        <MDBCol sm='6'>
+                                                            <MDBCardText>
+                                                                {edu.institute}
+                                                            </MDBCardText>
+                                                            <MDBCardText className='text-muted'>
+                                                                {edu.degree}
+                                                            </MDBCardText>
+                                                        </MDBCol>
+                                                        <MDBCol sm='6'>
+                                                            <MDBCardText className='text-muted'>
+                                                                {new Date(
+                                                                    edu.from
+                                                                ).toLocaleDateString()}
+                                                            </MDBCardText>
+                                                            <MDBCardText className='text-muted'>
+                                                                {new Date(
+                                                                    edu.to
+                                                                ).toLocaleDateString()}
+                                                            </MDBCardText>
+                                                        </MDBCol>
+                                                        <Button
+                                                            id={edu._id}
+                                                            variant='secondary'
+                                                            style={{
+                                                                marginTop:
+                                                                    '10px',
+                                                                width: '40px',
+                                                                marginLeft:
+                                                                    '10px',
+                                                            }}
+                                                            disabled={
+                                                                deletingEducationId ===
+                                                                edu._id
+                                                            }
+                                                            onClick={() =>
+                                                                deleteEducation(
+                                                                    edu._id
+                                                                )
+                                                            }
+                                                        >
+                                                            {deletingEducationId ===
+                                                            edu._id ? (
+                                                                <Spinner
+                                                                    animation='border'
+                                                                    role='status'
+                                                                    style={{
+                                                                        width: '20px',
+                                                                        height: '20px',
+                                                                    }}
+                                                                />
+                                                            ) : (
                                                                 <MdDelete />
-                                                            </Button>
-                                                        </MDBRow>
-                                                        <hr />
-                                                    </>
-                                                )
-                                            )}
+                                                            )}
+                                                        </Button>
+                                                    </MDBRow>
+                                                    <hr />
+                                                </>
+                                            ))}
                                         </MDBCardBody>
                                     </MDBCard>
                                 </MDBCol>
@@ -480,7 +593,9 @@ export default function Dashboard() {
                                             {currentData?.experience?.map(
                                                 (exp) => (
                                                     <>
-                                                        <MDBRow key={exp._id}>
+                                                        <MDBRow
+                                                            key={Date.now()}
+                                                        >
                                                             <MDBCol sm='6'>
                                                                 <MDBCardText>
                                                                     {

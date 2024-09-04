@@ -36,7 +36,7 @@ function Header() {
                                     marginRight: '10px',
                                     marginBottom: '2px',
                                 }}
-                                src='/logo.png'
+                                src='/favicon2.jpg'
                                 alt='logo'
                             />
                             Dev Connector

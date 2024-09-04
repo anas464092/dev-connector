@@ -22,7 +22,7 @@ app.use(
 
 app.use(
     cors({
-        origin: ['http://localhost:3000','http://deploy-mern-1whq.vercel.app'], // Allow requests from this origin
+        origin: ['http://localhost:3000'], // Allow requests from this origin
         methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
         credentials: true, // Allow credentials (e.g., cookies, authorization headers)
     })

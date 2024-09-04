@@ -42,8 +42,14 @@ export const postsApiSlice = apiSlice.injectEndpoints({
                 method: 'DELETE',
             }),
         }),
+        likedPosts: builder.mutation({
+            query: () => ({
+                url: `${POSTS_URL}/user/liked`,
+                method: 'GET',
+            }),
+        }),
     }),
-});
+})
 
 export const {
     useAddPostMutation,
@@ -52,4 +58,5 @@ export const {
     useLikeAndUnlikePostMutation,
     useAddCommentMutation,
     useDeleteCommentMutation,
+    useLikedPostsMutation,
 } = postsApiSlice;

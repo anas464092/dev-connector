@@ -17,6 +17,7 @@ import ProfilePage from './Pages/ProfilePage';
 import Dashboard from './Pages/Dashboard';
 import store from './store/store';
 import { Provider } from 'react-redux';
+import LikedPosts from './Pages/LikedPosts';
 
 const Root = () => (
     <Router>
@@ -27,6 +28,7 @@ const Root = () => (
                     <Route path='/post/:id' element={<SinglePost />} />
                     <Route path='/add-post' element={<AddPost />} />
                     <Route path='/dashboard' element={<Dashboard />} />
+                    <Route path='/liked-posts' element={<LikedPosts />} />
                 </Route>
                 <Route index path='/' element={<Home />} />
                 <Route path='/login' element={<Login />} />

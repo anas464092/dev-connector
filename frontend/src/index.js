@@ -18,6 +18,7 @@ import Dashboard from './Pages/Dashboard';
 import store from './store/store';
 import { Provider } from 'react-redux';
 import LikedPosts from './Pages/LikedPosts';
+import UserPosts from './Pages/UserPosts';
 
 const Root = () => (
     <Router>
@@ -29,6 +30,7 @@ const Root = () => (
                     <Route path='/add-post' element={<AddPost />} />
                     <Route path='/dashboard' element={<Dashboard />} />
                     <Route path='/liked-posts' element={<LikedPosts />} />
+                    <Route path='/user-posts' element={<UserPosts />} />
                 </Route>
                 <Route index path='/' element={<Home />} />
                 <Route path='/login' element={<Login />} />

@@ -214,7 +214,7 @@ export const getLikedPosts = asyncHandler(async (req, res) => {
     }
     const allPosts = await Post.find()
         .populate('author', 'name avatar _id')
-        .populate('likes.user', '_id'); // Populate 'likes.user' field
+        .populate('likes.user', '_id avatar'); // Populate 'likes.user' field
 
     // Filter posts that have been liked by the current user
     const likedPosts = allPosts.filter((post) =>

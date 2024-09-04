@@ -82,6 +82,11 @@ function Header() {
                                                 Liked Posts
                                             </NavDropdown.Item>
                                         </LinkContainer>
+                                        <LinkContainer to='/user-posts'>
+                                            <NavDropdown.Item>
+                                                My Posts
+                                            </NavDropdown.Item>
+                                        </LinkContainer>
                                         <NavDropdown.Item
                                             onClick={logoutHandler}
                                         >

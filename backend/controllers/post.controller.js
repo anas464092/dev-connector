@@ -48,6 +48,7 @@ export const getPost = asyncHandler(async (req, res) => {
         throw new ApiError(400, 'Id is required for finding specific post.');
     }
     const post = await Post.findById(id).populate('author', 'name avatar _id');
+    await post.populate('comments.user', 'avatar _id name');
     if (!post) {
         throw new ApiError(404, 'Post not found with this id.');
     }
@@ -120,14 +121,13 @@ export const likeAndUnlikePost = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, 'Post liked', { post, allPosts }));
 });
 
-
 // Add comment 💬
 export const addComment = asyncHandler(async (req, res) => {
     const { _id } = req.user;
     const { id } = req.params;
-    const { text, name, avatar, date } = req.body;
+    const { text } = req.body;
     if (!text) {
-        throw new ApiError(400, 'Text is required for comment.');
+        throw new ApiError(400, 'Content is required for comment.');
     }
     if (!id) {
         throw new ApiError(400, 'ID is required for the post');
@@ -139,16 +139,14 @@ export const addComment = asyncHandler(async (req, res) => {
     const comment = {
         user: _id,
         text: text,
-        name,
-        avatar,
-        date,
     };
     post.comments.unshift(comment);
     await post.save({ validateBeforeSave: false });
-    const updatePost = await Post.findById({ _id: id });
-    res.status(200).json(
-        new ApiError(200, 'Comment added successfuly', updatePost)
+    const updatePost = await Post.findById({ _id: id }).populate(
+        'comments.user',
+        'avatar name _id'
     );
+    res.status(200).json(new ApiResponse(200, 'Comment added', updatePost));
 });
 
 // Delete post....

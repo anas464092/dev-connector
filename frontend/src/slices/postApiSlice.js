@@ -29,6 +29,12 @@ export const postsApiSlice = apiSlice.injectEndpoints({
                 method: 'POST',
             }),
         }),
+        addComment: builder.mutation({
+            query: (id) => ({
+                url: `${POSTS_URL}/${id}`,
+                method: 'POST',
+            }),
+        }),
     }),
 });
 

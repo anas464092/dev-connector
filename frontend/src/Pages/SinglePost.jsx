@@ -9,6 +9,7 @@ import {
 } from '../slices/postApiSlice';
 import { toast } from 'react-toastify';
 import DOMPurify from 'dompurify'; // Import DOMPurify for HTML sanitization
+import Comment from '../components/Comment';
 
 function SinglePost() {
     const { id } = useParams();
@@ -21,6 +22,7 @@ function SinglePost() {
             try {
                 const res = await getPost(id).unwrap();
                 setPost(res.data);
+                console.log(res.data.comments);
             } catch (err) {
                 toast.error(err?.data?.message || 'Somrthing went wrong');
             }
@@ -214,56 +216,11 @@ function SinglePost() {
                                 </Button>
                             </Col>
                         </Row>
-                        {/* <Row style={{ marginTop: '10px' }}>
-                            <ListGroup>
-                                <ListGroup.Item>
-                                    <Row className='align-items-center'>
-                                        <Col xs='auto'>
-                                            <Image
-                                                className='rounded'
-                                                src={post.profile.profileImage}
-                                                alt='profile image'
-                                                fluid
-                                                style={{
-                                                    width: '40px',
-                                                }}
-                                            />
-                                        </Col>
-                                        <Col>
-                                            <h6>{post.profile.name}</h6>
-                                        </Col>
-                                    </Row>
-                                </ListGroup.Item>
-                                <ListGroup.Item>
-                                    {post.description}
-                                </ListGroup.Item>
-                            </ListGroup>
-                        </Row>
-                        <Row style={{ marginTop: '20px' }}>
-                            <ListGroup>
-                                <ListGroup.Item>
-                                    <Row className='align-items-center'>
-                                        <Col xs='auto'>
-                                            <Image
-                                                className='rounded'
-                                                src={post.profile.profileImage}
-                                                alt='profile image'
-                                                fluid
-                                                style={{
-                                                    width: '40px',
-                                                }}
-                                            />
-                                        </Col>
-                                        <Col>
-                                            <h6>{post.profile.name}</h6>
-                                        </Col>
-                                    </Row>
-                                </ListGroup.Item>
-                                <ListGroup.Item>
-                                    {post.description}
-                                </ListGroup.Item>
-                            </ListGroup>
-                        </Row> */}
+                        {post?.comments?.map((comment) => (
+                            <>
+                                <Comment key={comment._id} comment={comment} />
+                            </>
+                        ))}
                     </Row>
                 </>
             )}

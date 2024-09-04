@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Image, ListGroup, Row, Spinner } from 'react-bootstrap';
-import { BiSolidLike, BiSolidDislike } from 'react-icons/bi';
+import { Button, Col, Image, ListGroup, Row, Spinner } from 'react-bootstrap';
+import { BiSolidLike } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
-import { useAllPostsMutation } from '../slices/postApiSlice';
+import {
+    useAllPostsMutation,
+    useLikeAndUnlikePostMutation,
+} from '../slices/postApiSlice';
 import { toast } from 'react-toastify';
 import DOMPurify from 'dompurify'; // Import DOMPurify for HTML sanitization
 
@@ -26,6 +29,21 @@ function Posts() {
         fetchData();
     }, [allPosts]);
 
+    // ================================== LIKE / UNLIKE POST =======================
+    const [loadingState, setLoadingState] = useState(null);
+    const [likeAndUnlike] = useLikeAndUnlikePostMutation();
+    const likeHandler = async (id) => {
+        setLoadingState(id);
+        try {
+            const res = await likeAndUnlike(id).unwrap();
+            toast.success(res?.message || 'Liked or Unliked done');
+            setPosts(res.data.allPosts);
+        } catch (err) {
+            toast.error(err?.data?.message || 'Unable to like or Dislike');
+        }
+        setLoadingState(null);
+    };
+
     return (
         <>
             {isLoading ? (
@@ -48,10 +66,10 @@ function Posts() {
                 </div>
             ) : (
                 <>
-                    {posts.length === 0 ? (
+                    {posts?.length === 0 ? (
                         <h1>No posts added</h1>
                     ) : (
-                        posts.map((post) => (
+                        posts?.map((post) => (
                             <Row
                                 key={post._id}
                                 className='rounded'
@@ -99,12 +117,38 @@ function Posts() {
                                                     xs='auto'
                                                     className='d-flex flex-row gap-1 align-items-center'
                                                 >
-                                                    <h3>
-                                                        <BiSolidLike />
-                                                    </h3>
-                                                    <span>
+                                                    <Button
+                                                        onClick={() =>
+                                                            likeHandler(
+                                                                post._id
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            loadingState ===
+                                                            post._id
+                                                        }
+                                                    >
+                                                        {loadingState ===
+                                                        post._id ? (
+                                                            <>
+                                                                <Spinner
+                                                                    animation='border'
+                                                                    role='status'
+                                                                    style={{
+                                                                        width: '20px',
+                                                                        height: '20px',
+                                                                    }}
+                                                                />
+                                                            </>
+                                                        ) : (
+                                                            <h3>
+                                                                <BiSolidLike />
+                                                            </h3>
+                                                        )}
+                                                    </Button>
+                                                    <strong>
                                                         {post.likes.length}
-                                                    </span>
+                                                    </strong>
                                                 </Col>
                                             </Row>
                                         </ListGroup.Item>

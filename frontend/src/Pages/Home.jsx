@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from 'react-bootstrap';
 import Stack from 'react-bootstrap/Stack';
 import { LinkContainer } from 'react-router-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
+    const navigate = useNavigate();
+    useEffect(() => {
+        const userLoggedIn = localStorage.getItem('userInfo') || null;
+        if (userLoggedIn) {
+            navigate('/posts');
+        }
+    }, []);
     return (
         <div style={{ margin: '130px 0px' }}>
             <h1 style={{ color: '#03d3fc' }}>

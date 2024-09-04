@@ -3,7 +3,10 @@ import { useParams } from 'react-router';
 import { FloatingLabel, Form, Modal, Spinner } from 'react-bootstrap';
 import { Button, Col, Image, ListGroup, Row } from 'react-bootstrap';
 import { BiSolidLike, BiSolidDislike } from 'react-icons/bi';
-import { useGetPostMutation } from '../slices/postApiSlice';
+import {
+    useGetPostMutation,
+    useLikeAndUnlikePostMutation,
+} from '../slices/postApiSlice';
 import { toast } from 'react-toastify';
 import DOMPurify from 'dompurify'; // Import DOMPurify for HTML sanitization
 
@@ -18,7 +21,6 @@ function SinglePost() {
             try {
                 const res = await getPost(id).unwrap();
                 setPost(res.data);
-                console.log(res.data);
             } catch (err) {
                 toast.error(err?.data?.message || 'Somrthing went wrong');
             }
@@ -36,6 +38,21 @@ function SinglePost() {
 
     const handleAddCommentBtn = () => {
         setShow(true);
+    };
+
+    // ================================== LIKE / UNLIKE POST =======================
+    const [loadingState, setLoadingState] = useState(null);
+    const [likeAndUnlike] = useLikeAndUnlikePostMutation();
+    const likeHandler = async (id) => {
+        setLoadingState(id);
+        try {
+            const res = await likeAndUnlike(id).unwrap();
+            toast.success(res?.message || 'Liked or Unliked done');
+            setPost(res.data.post);
+        } catch (err) {
+            toast.error(err?.data?.message || 'Unable to like or Dislike');
+        }
+        setLoadingState(null);
     };
 
     return (
@@ -144,10 +161,34 @@ function SinglePost() {
                                             xs='auto'
                                             className='d-flex flex-row gap-1 align-items-center'
                                         >
-                                            <h3>
-                                                <BiSolidLike />
-                                            </h3>
-                                            <span>{post?.likes?.length}</span>
+                                            <Button
+                                                onClick={() =>
+                                                    likeHandler(post._id)
+                                                }
+                                                disabled={
+                                                    loadingState === post._id
+                                                }
+                                            >
+                                                {loadingState === post._id ? (
+                                                    <>
+                                                        <Spinner
+                                                            animation='border'
+                                                            role='status'
+                                                            style={{
+                                                                width: '20px',
+                                                                height: '20px',
+                                                            }}
+                                                        />
+                                                    </>
+                                                ) : (
+                                                    <h3>
+                                                        <BiSolidLike />
+                                                    </h3>
+                                                )}
+                                            </Button>
+                                            <strong>
+                                                {post?.likes?.length}
+                                            </strong>
                                         </Col>
                                     </Row>
                                 </ListGroup.Item>

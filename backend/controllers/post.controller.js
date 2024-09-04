@@ -78,37 +78,48 @@ export const deletePost = asyncHandler(async (req, res) => {
     );
 });
 
-// Like and like post 👍
+// Like and unlike post 👍
 export const likeAndUnlikePost = asyncHandler(async (req, res) => {
-    // Steps
-    // Only login user cant like post
-    // Take login user id from cookies
-    // Take the id of the post from req.params;
-    // Check if the post exist
-    // Check if the user already exist in the likes array
-    // If not add in it ----> like👍
-    // If yes remove it -----> dislike👎
     const { _id } = req.user;
     const { id } = req.params;
+
     if (!id) {
         throw new ApiError(400, 'ID is required for the post');
     }
+
     const post = await Post.findById(id);
     if (!post) {
         throw new ApiError(404, 'Post not found.');
     }
+
     const userIndex = post.likes.findIndex(
         (like) => like.user && like.user.toString() === _id.toString()
     );
+
     if (userIndex !== -1) {
+        // Unlike post
         post.likes.splice(userIndex, 1);
         await post.save({ validateBeforeSave: false });
-        return res.status(200).json(new ApiResponse(200, 'Post unliked', post));
+        await post.populate('author', 'name avatar _id'); // Populate after save
+        const allPosts = await Post.find().populate(
+            'author',
+            'name avatar _id'
+        );
+        return res
+            .status(200)
+            .json(new ApiResponse(200, 'Post Unliked', { post, allPosts }));
     }
+
+    // Like post
     post.likes.unshift({ user: _id });
     await post.save({ validateBeforeSave: false });
-    res.status(200).json(new ApiResponse(200, 'Post liked', post));
+    await post.populate('author', 'name avatar _id'); // Populate after save
+    const allPosts = await Post.find().populate('author', 'name avatar _id');
+    return res
+        .status(200)
+        .json(new ApiResponse(200, 'Post liked', { post, allPosts }));
 });
+
 
 // Add comment 💬
 export const addComment = asyncHandler(async (req, res) => {

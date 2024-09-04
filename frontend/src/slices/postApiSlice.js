@@ -23,8 +23,18 @@ export const postsApiSlice = apiSlice.injectEndpoints({
                 method: 'GET',
             }),
         }),
+        likeAndUnlikePost: builder.mutation({
+            query: (id) => ({
+                url: `${POSTS_URL}/${id}`,
+                method: 'POST',
+            }),
+        }),
     }),
 });
 
-export const { useAddPostMutation, useAllPostsMutation, useGetPostMutation } =
-    postsApiSlice;
+export const {
+    useAddPostMutation,
+    useAllPostsMutation,
+    useGetPostMutation,
+    useLikeAndUnlikePostMutation,
+} = postsApiSlice;

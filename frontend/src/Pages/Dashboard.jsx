@@ -32,10 +32,7 @@ import {
 } from '../slices/profileApiSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import {
-    useDeleteAccountMutation,
-    useLogoutMutation,
-} from '../slices/userApiSlice';
+import { useDeleteAccountMutation } from '../slices/userApiSlice';
 import { useNavigate } from 'react-router';
 import { logout } from '../slices/authSlice';
 
@@ -47,7 +44,6 @@ export default function Dashboard() {
     const [currentData, setCurrentData] = useState();
     const { userInfo } = useSelector((state) => state.auth);
 
-    const [Apilogout] = useLogoutMutation();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 

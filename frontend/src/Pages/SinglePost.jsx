@@ -2,17 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { FloatingLabel, Form, Modal, Spinner } from 'react-bootstrap';
 import { Button, Col, Image, ListGroup, Row } from 'react-bootstrap';
-import { BiSolidLike, BiSolidDislike } from 'react-icons/bi';
+import { BiSolidLike } from 'react-icons/bi';
 import {
     useAddCommentMutation,
+    useDeleteCommentMutation,
     useGetPostMutation,
     useLikeAndUnlikePostMutation,
 } from '../slices/postApiSlice';
 import { toast } from 'react-toastify';
 import DOMPurify from 'dompurify'; // Import DOMPurify for HTML sanitization
 import Comment from '../components/Comment';
+import { MdDelete } from 'react-icons/md';
+import { useSelector } from 'react-redux';
 
 function SinglePost() {
+    const { userInfo } = useSelector((state) => state.auth);
     const { id } = useParams();
     const [post, setPost] = useState({});
     const [commentContent, setCommentContent] = useState('');
@@ -32,11 +36,6 @@ function SinglePost() {
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
-    // const AddComment = () => {
-    //     console.log(commentContent);
-    //     setShow(false);
-    //     setCommentContent('');
-    // };
 
     const handleAddCommentBtn = () => {
         setShow(true);
@@ -77,6 +76,26 @@ function SinglePost() {
             console.log(err);
         }
         setCommentLoadingState(null);
+    };
+
+    // ======================= DELETING COMMENT =====================
+    const [deleltingLoading, setDeletingComment] = useState(null);
+    const [deleteComment] = useDeleteCommentMutation();
+    const deleteCommentHandler = async (postId, commentId) => {
+        setDeletingComment(commentId);
+        const payload = {
+            postId,
+            commentId,
+        };
+        try {
+            const res = await deleteComment(payload).unwrap();
+            setPost(res.data);
+            toast.success(res?.message);
+        } catch (err) {
+            toast.error(err?.data?.message);
+            console.log(err);
+        }
+        setDeletingComment(null);
     };
 
     return (
@@ -255,7 +274,44 @@ function SinglePost() {
                         </Row>
                         {post?.comments?.map((comment) => (
                             <>
-                                <Comment key={comment._id} comment={comment} />
+                                <ListGroup>
+                                    <ListGroup.Item>
+                                        <Comment
+                                            key={comment._id}
+                                            comment={comment}
+                                        />
+                                    </ListGroup.Item>
+                                    {userInfo?._id === comment?.user?._id && (
+                                        <ListGroup.Item>
+                                            <Button
+                                                onClick={() =>
+                                                    deleteCommentHandler(
+                                                        post._id,
+                                                        comment._id
+                                                    )
+                                                }
+                                                disabled={
+                                                    deleltingLoading ===
+                                                    comment?._id
+                                                }
+                                            >
+                                                {deleltingLoading ===
+                                                comment?._id ? (
+                                                    <Spinner
+                                                        animation='border'
+                                                        role='status'
+                                                        style={{
+                                                            width: '20px',
+                                                            height: '20px',
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <MdDelete />
+                                                )}
+                                            </Button>
+                                        </ListGroup.Item>
+                                    )}
+                                </ListGroup>
                             </>
                         ))}
                     </Row>

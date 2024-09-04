@@ -152,28 +152,38 @@ export const addComment = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200, 'Comment added', updatePost));
 });
 
-// Delete post....
+// Delete comment....
 export const deleteComment = asyncHandler(async (req, res) => {
-    const { _id } = req.user;
-    const { id } = req.params;
-    if (!id) {
+    console.log(req.prams);
+
+    const { _id } = req.user; // User ID
+    const { postId, commentId } = req.params; // Post and Comment IDs
+    if (!postId) {
         throw new ApiError(400, 'ID is required for the post');
     }
-    const post = await Post.findById({ _id: id });
+    if (!commentId) {
+        throw new ApiError(400, 'ID is required for the comment');
+    }
+    const post = await Post.findById(postId); // Find post by ID
     if (!post) {
         throw new ApiError(404, 'Post not found.');
     }
-    const userIndex = post.comments.findIndex(
-        (comment) => comment.user && comment.user.toString() === _id.toString()
+    // Find the index of the comment with the given commentId and userId
+    const commentIndex = post.comments.findIndex(
+        (comment) =>
+            comment._id.toString() === commentId &&
+            comment.user.toString() === _id.toString()
     );
-    if (userIndex !== -1) {
-        post.comments.splice(userIndex, 1);
+    if (commentIndex !== -1) {
+        // Remove the comment from the comments array
+        post.comments.splice(commentIndex, 1);
         await post.save({ validateBeforeSave: false });
+        await post.populate('author', 'avatar name _id');
+        await post.populate('comments.user', 'avatar name _id');
         return res
             .status(200)
             .json(new ApiResponse(200, 'Comment deleted', post));
     }
-    res.status(200).json(
-        new ApiResponse(200, 'You have not add any comment yet.', post)
-    );
+    // If no comment was found for deletion
+    throw new ApiError(404, 'Comment not found or not authorized to delete.');
 });

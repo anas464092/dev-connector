@@ -23,6 +23,6 @@ postsRoute.get('/:id', getPost);
 postsRoute.delete('/:id', verifyJWT, deletePost);
 postsRoute.post('/:id', verifyJWT, likeAndUnlikePost);
 postsRoute.post('/comment/:id', verifyJWT, addComment);
-postsRoute.delete('/comment/:id', verifyJWT, deleteComment);
+postsRoute.delete('/comment/:postId/:commentId', verifyJWT, deleteComment);
 
 export default postsRoute;

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { Col, Image, ListGroup, Row } from 'react-bootstrap';
 
 function Comment({ comment }) {
@@ -27,7 +27,6 @@ function Comment({ comment }) {
                     <ListGroup.Item>{comment?.text}</ListGroup.Item>
                 </ListGroup>
             </Row>
-            <hr />
         </>
     );
 }

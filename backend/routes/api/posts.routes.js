@@ -29,5 +29,4 @@ postsRoute.delete('/comment/:postId/:commentId', verifyJWT, deleteComment);
 postsRoute.get('/user/posts', verifyJWT, getMyPosts);
 postsRoute.get('/user/liked', verifyJWT, getLikedPosts);
 
-
 export default postsRoute;

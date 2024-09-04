@@ -4,6 +4,7 @@ import { BiSolidLike } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 import { BiSolidDislike } from 'react-icons/bi';
 import {
+    useDeletePostMutation,
     useLikeAndUnlikePostMutation,
     useLikedPostsMutation,
     useUserPostsMutation,
@@ -59,6 +60,32 @@ function UserPosts() {
             toast.error(err?.data?.message || 'Unable to like or Dislike');
         }
         setLoadingState(null);
+    };
+
+    // ============================ DELETING POST ======================
+    const [deleteLoading, setDeleteLoading] = useState(null);
+    const [deletePost] = useDeletePostMutation();
+    const handleDelete = async (id) => {
+        console.log(id);
+        try {
+            await deletePost(id).unwrap();
+            try {
+                await allPosts().unwrap();
+                try {
+                    const res = await allPosts().unwrap();
+                    setPosts(res.data.userPosts);
+                } catch (err) {
+                    toast.error(err?.data?.message || "Can't fetch posts");
+                    console.log(err);
+                }
+            } catch (err) {
+                toast.error(err?.data?.message || "Can't fetch posts");
+                console.log(err);
+            }
+        } catch (err) {
+            toast.error(err?.data?.message || 'Unable to delete post');
+        }
+        setDeleteLoading(null);
     };
 
     return (
@@ -187,6 +214,29 @@ function UserPosts() {
                                                     ),
                                                 }}
                                             />
+                                        </ListGroup.Item>
+                                        <ListGroup.Item>
+                                            <Button
+                                                onClick={() =>
+                                                    handleDelete(post?._id)
+                                                }
+                                                disabled={
+                                                    deleteLoading === post?._id
+                                                }
+                                            >
+                                                {deleteLoading === post?._id ? (
+                                                    <Spinner
+                                                        animation='border'
+                                                        role='status'
+                                                        style={{
+                                                            width: '20px',
+                                                            height: '20px',
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <>Delete Post</>
+                                                )}
+                                            </Button>
                                         </ListGroup.Item>
                                     </ListGroup>
                                 </Col>

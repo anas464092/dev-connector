@@ -206,6 +206,7 @@ export const getMyPosts = asyncHandler(async (req, res) => {
     );
 });
 
+// ============================ LIKED POSTS =========================
 export const getLikedPosts = asyncHandler(async (req, res) => {
     const { _id } = req.user;
 
@@ -228,3 +229,4 @@ export const getLikedPosts = asyncHandler(async (req, res) => {
         })
     );
 });
+

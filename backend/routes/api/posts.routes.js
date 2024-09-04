@@ -7,6 +7,8 @@ import {
     deleteComment,
     deletePost,
     getAllPosts,
+    getLikedPosts,
+    getMyPosts,
     getPost,
     likeAndUnlikePost,
 } from '../../controllers/post.controller.js';
@@ -24,5 +26,8 @@ postsRoute.delete('/:id', verifyJWT, deletePost);
 postsRoute.post('/:id', verifyJWT, likeAndUnlikePost);
 postsRoute.post('/comment/:id', verifyJWT, addComment);
 postsRoute.delete('/comment/:postId/:commentId', verifyJWT, deleteComment);
+postsRoute.get('/user/posts', verifyJWT, getMyPosts);
+postsRoute.get('/user/liked', verifyJWT, getLikedPosts);
+
 
 export default postsRoute;

@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Button, Col, Image, ListGroup, Row, Spinner } from 'react-bootstrap';
 import { BiSolidLike } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
+import { BiSolidDislike } from 'react-icons/bi';
 import {
     useAllPostsMutation,
     useLikeAndUnlikePostMutation,
 } from '../slices/postApiSlice';
 import { toast } from 'react-toastify';
 import DOMPurify from 'dompurify'; // Import DOMPurify for HTML sanitization
+import { useSelector } from 'react-redux';
 
 function Posts() {
     const [allPosts, { isLoading }] = useAllPostsMutation();
@@ -29,6 +31,8 @@ function Posts() {
         fetchData();
     }, [allPosts]);
 
+    const { userInfo } = useSelector((state) => state.auth);
+
     // ================================== LIKE / UNLIKE POST =======================
     const [loadingState, setLoadingState] = useState(null);
     const [likeAndUnlike] = useLikeAndUnlikePostMutation();
@@ -36,7 +40,6 @@ function Posts() {
         setLoadingState(id);
         try {
             const res = await likeAndUnlike(id).unwrap();
-            toast.success(res?.message || 'Liked or Unliked done');
             setPosts(res.data.allPosts);
         } catch (err) {
             toast.error(err?.data?.message || 'Unable to like or Dislike');
@@ -142,12 +145,21 @@ function Posts() {
                                                             </>
                                                         ) : (
                                                             <h3>
-                                                                <BiSolidLike />
+                                                                {post.likes.findIndex(
+                                                                    (like) =>
+                                                                        like.user &&
+                                                                        like.user.toString() ===
+                                                                            userInfo?._id.toString()
+                                                                ) ? (
+                                                                    <BiSolidLike />
+                                                                ) : (
+                                                                    <BiSolidDislike />
+                                                                )}
                                                             </h3>
                                                         )}
                                                     </Button>
                                                     <strong>
-                                                        {post.likes.length}
+                                                        {post?.likes?.length}
                                                     </strong>
                                                 </Col>
                                             </Row>

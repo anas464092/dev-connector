@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { FloatingLabel, Form, Modal, Spinner } from 'react-bootstrap';
 import { Button, Col, Image, ListGroup, Row } from 'react-bootstrap';
-import { BiSolidLike } from 'react-icons/bi';
+import { BiSolidDislike, BiSolidLike } from 'react-icons/bi';
 import {
     useAddCommentMutation,
     useDeleteCommentMutation,
@@ -48,7 +48,6 @@ function SinglePost() {
         setLoadingState(id);
         try {
             const res = await likeAndUnlike(id).unwrap();
-            toast.success(res?.message || 'Liked or Unliked done');
             setPost(res.data.post);
         } catch (err) {
             toast.error(err?.data?.message || 'Unable to like or Dislike');
@@ -240,7 +239,16 @@ function SinglePost() {
                                                     </>
                                                 ) : (
                                                     <h3>
-                                                        <BiSolidLike />
+                                                        {post?.likes?.findIndex(
+                                                            (like) =>
+                                                                like.user &&
+                                                                like.user.toString() ===
+                                                                    userInfo?._id.toString()
+                                                        ) ? (
+                                                            <BiSolidLike />
+                                                        ) : (
+                                                            <BiSolidDislike />
+                                                        )}
                                                     </h3>
                                                 )}
                                             </Button>

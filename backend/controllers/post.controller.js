@@ -187,3 +187,44 @@ export const deleteComment = asyncHandler(async (req, res) => {
     // If no comment was found for deletion
     throw new ApiError(404, 'Comment not found or not authorized to delete.');
 });
+
+// getting my post that i had posted======================
+export const getMyPosts = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    if (!_id) {
+        throw new ApiError(401, 'Unauthorized request');
+    }
+    const allPosts = await Post.find().populate('author', 'name avatar _id');
+    const userPosts = allPosts.filter(
+        (post) => post.author._id.toString() === _id.toString()
+    );
+    res.status(200).json(
+        new ApiResponse(200, 'User Post founds', {
+            noOfPosts: userPosts.length,
+            userPosts,
+        })
+    );
+});
+
+export const getLikedPosts = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+
+    if (!_id) {
+        throw new ApiError(401, 'Unauthorized request');
+    }
+    const allPosts = await Post.find()
+        .populate('author', 'name avatar _id')
+        .populate('likes.user', '_id'); // Populate 'likes.user' field
+
+    // Filter posts that have been liked by the current user
+    const likedPosts = allPosts.filter((post) =>
+        post.likes.some((like) => like.user._id.toString() === _id.toString())
+    );
+
+    res.status(200).json(
+        new ApiResponse(200, 'User posts found', {
+            noOfPosts: likedPosts.length,
+            likedPosts,
+        })
+    );
+});

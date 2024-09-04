@@ -1,6 +1,6 @@
 // finding id
 
-const arr = [22, 43, 53, 643, 7435, 754];
+const arr = [22, 43, 55, 643, 7435, 754];
 const flag = arr.find((item) => item === 53) !== undefined;
 console.log(flag);
 

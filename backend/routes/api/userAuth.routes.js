@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+    deleteUser,
     getCurrentUser,
     loginUser,
     logoutUser,
@@ -16,5 +17,6 @@ userRoute.post('/login', loginUser); // public
 
 userRoute.get('/current', verifyJWT, getCurrentUser); // private
 userRoute.get('/logout', verifyJWT, logoutUser); // private
+userRoute.delete('/delete', verifyJWT, deleteUser); // private
 
 export default userRoute;

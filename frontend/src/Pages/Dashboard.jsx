@@ -30,8 +30,14 @@ import {
     useAddExperienceMutation,
     useUpdateProfileMutation,
 } from '../slices/profileApiSlice';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import {
+    useDeleteAccountMutation,
+    useLogoutMutation,
+} from '../slices/userApiSlice';
+import { useNavigate } from 'react-router';
+import { logout } from '../slices/authSlice';
 
 export default function Dashboard() {
     const [addFieldName, setaddFieldName] = useState('');
@@ -40,6 +46,10 @@ export default function Dashboard() {
     const [currentProfile] = useGetCurrentMutation();
     const [currentData, setCurrentData] = useState();
     const { userInfo } = useSelector((state) => state.auth);
+
+    const [Apilogout] = useLogoutMutation();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const addBtn = (field) => {
         setaddFieldName(field);
@@ -203,6 +213,23 @@ export default function Dashboard() {
         }
 
         setUpdateProfileLoading(false);
+    };
+
+    // ================ DELETE ACCOUNT ========================
+    const [deleteAccountLoader, setDeleteAccountLoader] = useState(false);
+    const [deleteAccount] = useDeleteAccountMutation();
+    const deleteAccountHandler = async () => {
+        setDeleteAccountLoader(true);
+        try {
+            await deleteAccount().unwrap();
+            toast.success('Account deleted successfully.');
+            dispatch(logout());
+            navigate('/login');
+        } catch (err) {
+            toast.error('Unable to delete Account. TRY LATER');
+            console.log(err);
+        }
+        setDeleteAccountLoader(false);
     };
 
     return (
@@ -735,7 +762,7 @@ export default function Dashboard() {
                         </MDBCol>
                     </MDBRow>
                     <Button
-                        className='mt-4 p-2'
+                        className='ml-2 p-2'
                         disabled={updateProfileLoading}
                         onClick={updateProfileHandler}
                     >
@@ -743,6 +770,18 @@ export default function Dashboard() {
                             <Spinner animation='border' role='status' />
                         ) : (
                             <>Update Profile</>
+                        )}
+                    </Button>
+                    <Button
+                        onClick={deleteAccountHandler}
+                        className='m-2 p-2'
+                        disabled={deleteAccountLoader}
+                    >
+                        {' '}
+                        {deleteAccountLoader ? (
+                            <Spinner animation='border' role='status' />
+                        ) : (
+                            <>Delete Account</>
                         )}
                     </Button>
                 </MDBContainer>

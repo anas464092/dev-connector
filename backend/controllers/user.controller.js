@@ -2,7 +2,8 @@ import asyncHanlder from '../utils/asyncHandler.js';
 import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
 import User from '../models/User.model.js';
-import gravatar from 'gravatar';
+import Post from '../models/Post.model.js';
+import Profile from '../models/Profile.model.js';
 import uploadOnCloudinary from '../utils/cloudinary.js';
 
 // Register user
@@ -145,4 +146,29 @@ export const logoutUser = asyncHanlder(async (req, res) => {
                 email: user.email,
             })
         );
+});
+
+// ===================== DELETE USER ===========================
+export const deleteUser = asyncHanlder(async (req, res) => {
+    const { _id } = req.user;
+    const user = await User.findById(_id);
+    if (!user) {
+        throw new ApiError('User not found');
+    }
+    const posts = await Post.find({ author: _id });
+    if (posts?.length) {
+        await Promise.all(
+            posts.map((post) => Post.findByIdAndDelete(post._id))
+        );
+    }
+    const userProfile = await Profile.findOne({ user: _id });
+    if (userProfile) {
+        await Profile.findByIdAndDelete({ _id: userProfile._id });
+    }
+    await User.findByIdAndDelete(_id);
+    const checkUser = await User.findById(_id);
+    if (checkUser) {
+        throw new ApiError(400, 'Unable to delete account.');
+    }
+    res.status(200).json(new ApiResponse(200, 'User deleted', null));
 });

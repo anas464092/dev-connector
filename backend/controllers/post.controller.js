@@ -102,6 +102,7 @@ export const likeAndUnlikePost = asyncHandler(async (req, res) => {
         post.likes.splice(userIndex, 1);
         await post.save({ validateBeforeSave: false });
         await post.populate('author', 'name avatar _id'); // Populate after save
+        await post.populate('comments.user', 'avatar _id name');
         const allPosts = await Post.find().populate(
             'author',
             'name avatar _id'
@@ -115,6 +116,7 @@ export const likeAndUnlikePost = asyncHandler(async (req, res) => {
     post.likes.unshift({ user: _id });
     await post.save({ validateBeforeSave: false });
     await post.populate('author', 'name avatar _id'); // Populate after save
+    await post.populate('comments.user', 'avatar _id name');
     const allPosts = await Post.find().populate('author', 'name avatar _id');
     return res
         .status(200)
@@ -146,6 +148,7 @@ export const addComment = asyncHandler(async (req, res) => {
         'comments.user',
         'avatar name _id'
     );
+    await updatePost.populate('author', 'avatar name _id');
     res.status(200).json(new ApiResponse(200, 'Comment added', updatePost));
 });
 

@@ -30,9 +30,10 @@ export const postsApiSlice = apiSlice.injectEndpoints({
             }),
         }),
         addComment: builder.mutation({
-            query: (id) => ({
-                url: `${POSTS_URL}/${id}`,
+            query: ({ id, text }) => ({
+                url: `${POSTS_URL}/comment/${id}`,
                 method: 'POST',
+                body: { text },
             }),
         }),
     }),
@@ -43,4 +44,5 @@ export const {
     useAllPostsMutation,
     useGetPostMutation,
     useLikeAndUnlikePostMutation,
+    useAddCommentMutation,
 } = postsApiSlice;

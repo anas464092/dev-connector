@@ -4,6 +4,7 @@ import { FloatingLabel, Form, Modal, Spinner } from 'react-bootstrap';
 import { Button, Col, Image, ListGroup, Row } from 'react-bootstrap';
 import { BiSolidLike, BiSolidDislike } from 'react-icons/bi';
 import {
+    useAddCommentMutation,
     useGetPostMutation,
     useLikeAndUnlikePostMutation,
 } from '../slices/postApiSlice';
@@ -22,7 +23,6 @@ function SinglePost() {
             try {
                 const res = await getPost(id).unwrap();
                 setPost(res.data);
-                console.log(res.data.comments);
             } catch (err) {
                 toast.error(err?.data?.message || 'Somrthing went wrong');
             }
@@ -32,11 +32,11 @@ function SinglePost() {
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
-    const AddComment = () => {
-        console.log(commentContent);
-        setShow(false);
-        setCommentContent('');
-    };
+    // const AddComment = () => {
+    //     console.log(commentContent);
+    //     setShow(false);
+    //     setCommentContent('');
+    // };
 
     const handleAddCommentBtn = () => {
         setShow(true);
@@ -55,6 +55,28 @@ function SinglePost() {
             toast.error(err?.data?.message || 'Unable to like or Dislike');
         }
         setLoadingState(null);
+    };
+
+    // ========================== ADDING COMMENT =========================
+    const [commentloadingState, setCommentLoadingState] = useState(null);
+    const [addComment] = useAddCommentMutation();
+    const AddComment = async (id) => {
+        const payload = {
+            id,
+            text: commentContent,
+        };
+        setCommentLoadingState(id);
+        try {
+            const res = await addComment(payload).unwrap();
+            toast.success(res?.message || 'Commment added');
+            setPost(res.data);
+            setShow(false);
+            setCommentContent('');
+        } catch (err) {
+            toast.error(err?.data?.message || 'Unable to add Comment');
+            console.log(err);
+        }
+        setCommentLoadingState(null);
     };
 
     return (
@@ -114,8 +136,23 @@ function SinglePost() {
                                 >
                                     Close
                                 </Button>
-                                <Button variant='primary' onClick={AddComment}>
-                                    Add Comment
+                                <Button
+                                    variant='primary'
+                                    disabled={commentloadingState}
+                                    onClick={() => AddComment(post?._id)}
+                                >
+                                    {commentloadingState ? (
+                                        <Spinner
+                                            animation='border'
+                                            role='status'
+                                            style={{
+                                                width: '20px',
+                                                height: '20px',
+                                            }}
+                                        />
+                                    ) : (
+                                        <>Add Comment</>
+                                    )}
                                 </Button>
                             </Modal.Footer>
                         </Modal>
@@ -165,13 +202,13 @@ function SinglePost() {
                                         >
                                             <Button
                                                 onClick={() =>
-                                                    likeHandler(post._id)
+                                                    likeHandler(post?._id)
                                                 }
                                                 disabled={
-                                                    loadingState === post._id
+                                                    loadingState === post?._id
                                                 }
                                             >
-                                                {loadingState === post._id ? (
+                                                {loadingState === post?._id ? (
                                                     <>
                                                         <Spinner
                                                             animation='border'
@@ -198,7 +235,7 @@ function SinglePost() {
                                     <div
                                         dangerouslySetInnerHTML={{
                                             __html: DOMPurify.sanitize(
-                                                post.content
+                                                post?.content
                                             ),
                                         }}
                                     />

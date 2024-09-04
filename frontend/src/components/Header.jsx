@@ -14,7 +14,7 @@ function Header() {
 
     const logoutHandler = async () => {
         try {
-            const res = await Apilogout().unwrap();
+            await Apilogout().unwrap();
             dispatch(logout());
             navigate('/login');
         } catch (err) {

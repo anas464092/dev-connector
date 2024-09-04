@@ -6,7 +6,6 @@ import { BiSolidDislike } from 'react-icons/bi';
 import {
     useDeletePostMutation,
     useLikeAndUnlikePostMutation,
-    useLikedPostsMutation,
     useUserPostsMutation,
 } from '../slices/postApiSlice';
 import { toast } from 'react-toastify';

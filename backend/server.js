@@ -1,11 +1,19 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 import userRoute from './routes/api/userAuth.routes.js';
 import postsRoute from './routes/api/posts.routes.js';
 import profileRoute from './routes/api/profile.routes.js';
 
 const app = express();
+
+// Define __filename and __dirname in ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use(
     express.json({
         limit: '10mb',
@@ -34,11 +42,20 @@ app.use('/api/users', userRoute);
 app.use('/api/posts', postsRoute);
 app.use('/api/profile', profileRoute);
 
-app.get('/', (req, res) => {
-    res.send('Hello from the server....');
-});
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../frontend/build')));
+    app.get('*', (req, res) => {
+        res.sendFile(
+            path.resolve(__dirname, '../frontend/build', 'index.html')
+        );
+    });
+} else {
+    app.get('/', (req, res) => {
+        res.send('API is running....');
+    });
+}
 
-// Global Error handler....
+// Global Error handler
 app.use((err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || 'fail';

@@ -1,6 +1,6 @@
 # Dev Connector
 
-Dev Connector is a social networking application where developers can register themselves, create a profile, and share posts. Developers can also like/dislike posts, add experience and education, and delete posts.
+Dev Connector is a social networking application where developers can register, create a profile, and share their ideas through posts. They can help other developers by commenting on their issues. Developers can also like or dislike posts, add experience and education to their profiles, and delete their own posts.
 
 ## Features
 
